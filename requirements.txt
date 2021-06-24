@@ -1,0 +1,9 @@
+pandas~=1.2.4
+numpy~=1.19.5
+matplotlib~=3.3.4
+scipy~=1.6.2
+statsmodels~=0.12.2
+PythonMeta~=1.23
+requests~=2.25.1
+statistics~=1.0.3.5
+seaborn~=0.11.1
