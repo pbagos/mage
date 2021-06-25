@@ -4,7 +4,6 @@ import scipy.stats as st
 import numpy as np
 import plots
 
-
 from scipy.stats import norm
 from scipy.stats import chi2
 from collections import defaultdict
@@ -225,6 +224,7 @@ def split_data(dataframe_list):
         pd.set_option('display.width', None)
 
     return expressions_team1, expressions_team2, expressions_team3, means1_table, means2_table, means3_table
+
 
 # print(expressions_team1)
 # With this function we can conduct a meta-analysis (Random models, IV-Heg,and SMD)
@@ -554,7 +554,7 @@ def run(settings, data, filepath):
     multiple_tests = settings['multiple_tests']
     num_of_studies = len(data)
     expressions_team1, expressions_team2, expressions_team3, means1_table, means2_table, means3_table = split_data(data)
-    df = calc_meta_data(expressions_team1, expressions_team2, expressions_team3,num_of_studies)
+    df = calc_meta_data(expressions_team1, expressions_team2, expressions_team3, num_of_studies)
     df = df.dropna()  # remove Nan lines
 
     if (multiple_tests != 'none') & (venn_correction != 'none'):

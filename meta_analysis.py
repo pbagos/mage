@@ -10,7 +10,8 @@ import itertools
 from scipy.stats import norm
 from scipy.stats.distributions import chi2
 from collections import defaultdict
-global genes_p_values, meta_analysis_df, study, num_of_studies, effect_size_list, ind1, ind2, all_genes, means1_table, means2_table,genes_for_ea
+
+global genes_p_values, meta_analysis_df, study, num_of_studies, effect_size_list, ind1, ind2, all_genes, means1_table, means2_table, genes_for_ea
 genes_p_values = []
 meta_analysis_df = []
 ind1 = []

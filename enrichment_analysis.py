@@ -1,5 +1,3 @@
-import requests
-import pandas as pd
 import numpy as np
 from gprofiler import GProfiler
 
@@ -26,6 +24,6 @@ def run(settings, genes):
                      )
 
     var['negative_log10_of_adjusted_p_value'] = -np.log10(var.p_value)
-    #print(var.head().to_string())
+
     #print(var.head())
     return var
