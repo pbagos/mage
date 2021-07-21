@@ -121,7 +121,7 @@ def ea_heatmap_plot(data, filepath):
 
         df = df.fillna(0)
         # print(df)
-        plt.figure("Heatmap plot - " + source, figsize=(30, 10), dpi=80)
+        plt.figure("Heatmap plot - " + source, figsize=(30, 15), dpi=80)
         sns.heatmap(df, cmap='RdYlGn_r')
         sns.set(font_scale=1.2)
 
@@ -130,4 +130,3 @@ def ea_heatmap_plot(data, filepath):
         plt.ylabel('Terms', fontsize=15)  # y-axis label with fontsize 15
         plt.savefig(filepath + "/heatmap_plot_" + source + ".png")
         # plt.show()
-

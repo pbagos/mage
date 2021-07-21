@@ -429,11 +429,6 @@ def calc_meta_data(expressions_team1, expressions_team2, expressions_team3, num_
             p_w = math.exp(-(w / 2))
             p_w_list.append(p_w)
 
-            #             z-score
-            #              z = −0.862 + √[0.743 − 2.404×log(P)]
-
-            #             z = -0.862 + math.sqrt(0.743 - 2.404*math.log(p_w))
-
             # Monoplevros elegxos
             z = 1 - st.norm.ppf(p_w)
             z_list.append(z)
@@ -452,13 +447,10 @@ def calc_meta_data(expressions_team1, expressions_team2, expressions_team3, num_
 
             var_global1_list.append(var_global2)
 
-        # g1,g2 me ta standard erros tous  gia input
-        # kai meta afou bgaloyme w kai d kanoyme metanalisi
-
+        # g1,g2 for standard errors
         # Stoufer
         stoufer_weighted = sum(w_i_sqrt_list) / (math.sqrt(sum(w_i_list)))  # weighted stoufer
         stoufer = sum(z_list) / math.sqrt(len(z_list))  # stoufer
-
         p_stoufer_weighted = 2 * (1 - norm.cdf(abs(stoufer_weighted)))
         p_stoufer = 2 * (1 - norm.cdf(abs(stoufer)))
 
@@ -469,17 +461,14 @@ def calc_meta_data(expressions_team1, expressions_team2, expressions_team3, num_
         # fisher_list.append(fisher)
 
         # Edgington1
-
         p_edg1 = (sum(p_w_list) ** num_of_studies) / math.factorial(num_of_studies)
 
         # Edgington2
-
         p_hat = sum(p_w_list) / num_of_studies
-
         U_edg2 = (0.5 - p_hat) * math.sqrt(12)
         p_edg2 = 2 * (1 - norm.cdf(abs(U_edg2)))
 
-        new_row = {'Genes': gene, "g1": g1_list, "g2": g2_list, "cov_g1_g2": cov_g1g2_list, "varg1": var_g1_list,
+        new_row = {'Gene': gene, "g1": g1_list, "g2": g2_list, "cov_g1_g2": cov_g1g2_list, "varg1": var_g1_list,
                    'varg2': var_g2_list, 'w': w2_list, 'var_global_list': var_global1_list, "es": es_list,
                    'se': se_list,
                    'diff': diff_list, 'std_err_diff': std_err_diff_list,
@@ -581,7 +570,7 @@ def run(settings, data, filepath):
 
         df.to_csv("results_multivariate.txt", sep='\t', mode='w')
         df = df.loc[:, ~df.columns.duplicated()]
-        genes_venn = list(df['Genes_' + multiple_tests])
+        genes_venn = list(df['genes_' + multiple_tests])
 
         list1 = list(df[venn_correction + '_p_g1'])
         list2 = list(df[venn_correction + '_p_g2'])

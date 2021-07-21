@@ -19,7 +19,7 @@ version = '1.0.2'
 
 
 def parse_args():
-    print("Preparing System Arguments");
+    print("Preparing System Arguments")
     """Parse input arguments."""
     parser = argparse.ArgumentParser(description='Process Tool Arguments')
     # One argument for the configuration file conf.txt
@@ -31,7 +31,7 @@ def parse_args():
 
 
 def parse_conf(conf_filename):
-    print("Preparing System Configuration (" + conf_filename + ")");
+    print("Preparing System Configuration (" + conf_filename + ")")
     """Parse configuration arguments."""
     conf = configparser.ConfigParser(comment_prefixes='#', allow_no_value=True)
     conf.read(conf_filename)

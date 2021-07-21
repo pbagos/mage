@@ -3,8 +3,10 @@
 #set the folder name contains study files
 study_dir = demo_user/studies/
 #Study files list separated by comma (,)
-study_files = study1.txt, study2.txt,study3.txt, study4.txt, study5.txt,study6.txt,study7.txt,study8.txt,study9.txt,study10.txt
+#study_files = study1.txt, study2.txt,study3.txt, study4.txt, study5.txt,study6.txt,study7.txt,study8.txt,study9.txt,study10.txt
 #study_files = a1.txt, a2.txt,a3.txt,a4.txt
+#study_files = 1.txt, 2.txt,3.txt,4.txt
+study_files = 1_mvmeta.txt, 2_mvmeta.txt, 3_mvmeta.txt
 plots = YES
 
 #GISU Options
@@ -24,21 +26,21 @@ bootstrap = NO
 num_of_reps = 100
 #Level of Significance of Mulitple Comparisons
 significance_level = 0.05
-annotation = mage_teams.txt
-multiple_comparisons = bonferroni,sidak
+#one_step , step_down, step_up, all
+multiple_comparisons = all
 
 #Multivariate Analysis Options
-multivariate = NO
+multivariate = YES
 #bonferroni, sidak, holm, holland, hochberg, simes, none
 venn_correction = bonferroni
-#Choices = 'global1_RE', global1_stoufer,  global1_stoufer_weighted  ,global1_p_fisher,  global1_p_edg1  global1_p_edg2    global2
+#Choices = global1_RE, global1_stoufer, global1_stoufer_weighted , global1_p_fisher,  global1_p_edg1  global1_p_edg2, global2
 venn_choice = global1_stoufer_weighted
 alpha = 0.05
-# Multiple_tests choices = one_step , step_down, step_up,none
+# Multiple_tests choices = one_step , step_down, step_up, none
 multiple_tests = one_step
 
 #Enrichment Analysis Options
-enrichment_analysis = YES
+enrichment_analysis = NO
 organism = hsapiens
 threshold = 0.0001
 #Default 'fdr'. Other options are 'bonferroni' and 'g_SCS'

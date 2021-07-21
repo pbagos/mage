@@ -7,3 +7,5 @@ PythonMeta~=1.23
 requests~=2.25.1
 statistics~=1.0.3.5
 seaborn~=0.11.1
+gprofiler-official~=1.0.0
+matplotlib-venn~=0.11.6
