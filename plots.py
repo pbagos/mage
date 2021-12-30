@@ -7,7 +7,7 @@ from matplotlib_venn import venn3_circles, venn3
 
 
 def meta_analysis_plots(meta_analysis_df, filepath):
-    alpha = 0.05
+    alpha = 0.01
 
     # QQ plot
     plt.figure("QQ plot ")
@@ -77,9 +77,9 @@ def multivariate_plots(list1, list2, list3, venn_correction, venn_choice, filepa
     plt.savefig(filepath + "/venn_plot.png")
 
 
-def ea_manhattan_plot(data, filepath):
-    df = data.loc[data.p_value < 0.05, ['source', 'native', 'p_value', 'negative_log10_of_adjusted_p_value']]
-
+def ea_manhattan_plot(data, filepath, p_threshold):
+    df = data.loc[data.p_value < p_threshold, ['source', 'native', 'p_value', 'negative_log10_of_adjusted_p_value']]
+    df = df.where(df ['negative_log10_of_adjusted_p_value'] <= 16)
     # Generate Manhattan plot: (#optional tweaks for relplot: linewidth=0, s=9)
     df['group_id'] = df.groupby('source').ngroup()
     df.sort_values(['group_id', 'native'], inplace=True)
@@ -92,12 +92,11 @@ def ea_manhattan_plot(data, filepath):
     # palette: Paired, Set2, bright, dark, coloblind, deep
     plot = sns.relplot(data=df, x='i', y='negative_log10_of_adjusted_p_value', aspect=4,
                        hue='source', palette='bright', legend='full')
-    plot.ax.axhline(12, linestyle='--', linewidth=1)
+    plot.ax.axhline(16, linestyle='--', linewidth=1)
 
     plot.set_axis_labels('chromosomes', '-log10(Padj)')
     plot.fig.suptitle('Enrichment Analysis - Manhattan plot', fontsize=16)
     plot.ax.set_xticks(df.groupby('group_id')['i'].median())
-
     plot.ax.set_xticklabels(df['source'].unique(), rotation=25)
     plt.savefig(filepath + "/manhattan_plot.png")
 

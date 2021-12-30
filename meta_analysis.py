@@ -11,7 +11,7 @@ from scipy.stats import norm
 from scipy.stats.distributions import chi2
 from collections import defaultdict
 
-global genes_p_values, meta_analysis_df, study, num_of_studies, effect_size_list, ind1, ind2, all_genes, means1_table, means2_table, genes_for_ea
+global genes_p_values, meta_analysis_df, study, num_of_studies, effect_size_list, ind1, ind2, all_genes, means1_table, means2_table, genes_for_ea,controls_metan,cases_metan
 genes_p_values = []
 meta_analysis_df = []
 ind1 = []
@@ -30,24 +30,22 @@ def split_data(dataframe_list):
     means2_table = []
     for df in dataframe_list:
         # take the unique list annotation symbols
-        annot_list = df.loc[1][1:].to_list()
-        annot_list_unique = sorted(list(set(annot_list)))
-
         gene_of_study = df.iloc[2:, 0].reset_index(drop=True)
         gene_of_study = gene_of_study.to_frame()
 
-        # team1
-        team_cols1 = list(np.array(np.where(df.loc[1] == annot_list_unique[0]), dtype=int).flatten())
+        team_cols1 = list(np.array(np.where(df.loc[1] == controls_metan), dtype=object).flatten())
+        # team2
+        team_cols2 = list(np.array(np.where(df.loc[1] == cases_metan), dtype=object).flatten())
+
         ind1.append(team_cols1)
-        # expressions
+        # expressions team1
         data_team1 = df.iloc[2:][team_cols1].astype(float).reset_index(drop=True)
         # concat expressions with the genes
         new_df1 = pd.concat([gene_of_study, data_team1], axis=1)
         expressions_team1.append(new_df1)
 
-        # team2
-        team_cols2 = list(np.array(np.where(df.loc[1] == annot_list_unique[1]), dtype=int).flatten())
-        # expressions
+
+        # expressions team2
         data_team2 = df.iloc[2:][team_cols2].astype(float).reset_index(drop=True)
 
         ind2.append(team_cols2)
@@ -551,7 +549,7 @@ def get_step_down_methods(meta_analysis_df,
 
 # With this function we can get the step up methods (Simes and Hochberg)
 def get_step_up_methods(meta_analysis_df,
-                        alpha):  # This function takes the Sidak and the Bonferoni multiple test method
+                        alpha):  # This function takes the (Simes and Hochberg)
 
     m = len(meta_analysis_df['p_value'])
     meta_analysis_df = meta_analysis_df.sort_values(by=['p_value'], ascending=False)  # sort by p_value
@@ -572,10 +570,10 @@ def get_step_up_methods(meta_analysis_df,
         else:
             simes.append(1)
 
-    step_down_methods = pd.DataFrame(list(zip(list(meta_analysis_df['Genes']), p_values, hochberg, simes)),
-                                     columns=['genes_step_down', 'p_values_step_down', 'hochberg', 'simes'])
+    step_up_methods = pd.DataFrame(list(zip(list(meta_analysis_df['Genes']), p_values, hochberg, simes)),
+                                     columns=['genes_step_up', 'p_values_step_up', 'hochberg', 'simes'])
     # print(step_down_methods)
-    return step_down_methods
+    return step_up_methods
 
 
 # call  all the Multiple - tests functions (Bonferroni,Sidak,Holm,Holland,Simes and Hochberg from the upper functions)
@@ -589,10 +587,13 @@ def all_multiple_tests(meta_analysis_df, alpha):
 
 
 def run(settings, data):
+    global controls_metan,cases_metan
     num_of_reps = int(settings['num_of_reps'])
     alpha = float(settings['alpha'])
     mult_tests = settings['multiple_comparisons']
     bootstrap = settings['bootstrap']
+    controls_metan = settings ['controls']
+    cases_metan  = settings ['cases']
 
     # Splits the cases and the controls of our study
     expressions_team1, expressions_team2, means1_table, means2_table = split_data(data)
@@ -602,6 +603,7 @@ def run(settings, data):
         meta_analysis_df = bootstrap_analysis(expressions_team2, expressions_team1, means1_table, means2_table,
                                               n=num_of_reps)
     else:
+
         meta_analysis_df = calc_metadata(expressions_team1, expressions_team2)
 
     # Each function of these functions, conducts the multiple test functions  and returns a dataframe.

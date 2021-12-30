@@ -95,7 +95,7 @@ if __name__ == '__main__':
         enrichment_analysis_df.to_csv(filepath + 'enrichment_analysis_results.txt',
                                       header=enrichment_analysis_df.columns, index=None, sep='\t', mode='a')
         if settings.get('plots') == 'YES':
-            plots.ea_manhattan_plot(enrichment_analysis_df, filepath)
+            plots.ea_manhattan_plot(enrichment_analysis_df, filepath, settings['threshold'])
             plots.ea_heatmap_plot(enrichment_analysis_df, filepath)
 
     t1 = time.time()

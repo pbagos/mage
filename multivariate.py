@@ -8,7 +8,7 @@ from scipy.stats import norm
 from scipy.stats import chi2
 from collections import defaultdict
 
-global ind1, ind2, ind3, all_genes, num_of_studies
+global ind1, ind2, ind3, all_genes, num_of_studies,controls, multivariate,cases_multivariate1,cases_multivariate2
 
 all_genes = []
 ind1 = []
@@ -134,8 +134,8 @@ def split_data(dataframe_list):
     all_genes = []
     for df in dataframe_list:
         # take the unique list annotation symbols
-        annot_list = df.loc[1][1:].to_list()
-        annot_list_unique = sorted(list(set(annot_list)))
+        # annot_list = df.loc[1][1:].to_list()
+        # annot_list_unique = sorted(list(set(annot_list)))
 
         gene_of_study = df.iloc[2:][0].reset_index(drop=True)
         gene_of_study = gene_of_study.to_frame()
@@ -143,7 +143,11 @@ def split_data(dataframe_list):
         gene_of_study2 = gene_of_study.rename(columns={0: 'GENES'}, inplace=False)
 
         # team1
-        team_cols1 = list(np.array(np.where(df.loc[1] == annot_list_unique[0]), dtype=int).flatten())
+
+        team_cols1 = list(np.array(np.where(df.loc[1] == controls_multivariate), dtype=object).flatten())
+        team_cols2 = list(np.array(np.where(df.loc[1] == cases_multivariate1), dtype=object).flatten())
+        team_cols3 = list(np.array(np.where(df.loc[1] == cases_multivariate2), dtype=object).flatten())
+
         ind1.append(team_cols1)
         # expressions
         data_team1 = df.iloc[2:][team_cols1].astype(float).reset_index(drop=True)
@@ -154,7 +158,6 @@ def split_data(dataframe_list):
         # calculate the means std_dev and columns
 
         # team2
-        team_cols2 = list(np.array(np.where(df.loc[1] == annot_list_unique[1]), dtype=int).flatten())
         # expressions
         data_team2 = df.iloc[2:][team_cols2].astype(float).reset_index(drop=True)
 
@@ -164,7 +167,6 @@ def split_data(dataframe_list):
         expressions_team2.append(new_df2)
 
         # team3
-        team_cols3 = list(np.array(np.where(df.loc[1] == annot_list_unique[2]), dtype=int).flatten())
         # expressions
         data_team3 = df.iloc[2:][team_cols3].astype(float).reset_index(drop=True)
 
@@ -409,8 +411,7 @@ def calc_meta_data(expressions_team1, expressions_team2, expressions_team3, num_
             n3 = n3_list[i]
             N = n1 + n2 + n3
 
-            #             the W formula simplified in order to get the p_value  easily
-
+            #the W formula simplified in order to get the p_value  easily
             w = ((g1 ** 2) * varg2 + (- 2 * g1 * g2 * covg1g2) + (g2 ** 2) * varg1) / ((varg1 * varg2) - (covg1g2 ** 2))
 
             # me diff kai stdrer_diff kanw metanalisi   (global 2 - nadia )
@@ -505,7 +506,7 @@ def calc_meta_data(expressions_team1, expressions_team2, expressions_team3, num_
         std_err_global2, mu_bar_global2, p_global2 = altmeta(es_g3, se_g3)
         std_err_global1, mu_bar_global1, p_global1 = altmeta(es_g4, se_g4)
 
-        #         print(new_df['Gene'][i], Q, I2, tau2_DL, p_Q, se, z, mu_bar, p)
+        # print(new_df['Gene'][i], Q, I2, tau2_DL, p_Q, se, z, mu_bar, p)
 
         new_row1 = {'Genes': new_df['Gene'][i], "g1": mu_bar_g1, 'se_g1': std_err_g1, 'p_g1': p_g1}
         final_df_list1.append(new_row1)
@@ -537,6 +538,10 @@ def calc_meta_data(expressions_team1, expressions_team2, expressions_team3, num_
 
 
 def run(settings, data, filepath):
+    global controls_multivariate,cases_multivariate1,cases_multivariate2
+    controls_multivariate = settings ['controls_multivariate']
+    cases_multivariate1  = settings ['cases_multivariate1']
+    cases_multivariate2 = settings ['cases_multivariate2']
     alpha = float(settings['alpha'])
     venn_correction = settings['venn_correction']
     venn_choice = settings['venn_choice']
