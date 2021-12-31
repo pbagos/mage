@@ -32,18 +32,16 @@ The juchmme program is controlled by a list of command-line argument options. Th
 ## Methods
 M.A.G.E is consisted of three basic functions. 
 
-####GISU (Gene ID / Symbol update)
+#### GISU (Gene ID / Symbol update)
 MAGE uses an optional component called GISU to transform the platform's probe identifiers to gene symbols identifiers. These can be helpful when one is comparing datasets aris-ing from different platforms, then the probe identifiers must be con-verted to gene identifiers. Considering that multiple probes may corre-spond to the same gene in a microarray experiment [1], the multiple entries of the same gene can be combined into one using the minimum, maximum or arithmetic mean (average) [1,2,3]. If the experiment's platform is not included in the list, the user can upload the platform file in order to proceed to the transformation.
-####Meta-analysis: 
+#### Meta-analysis: 
 For meta-analysis, the package supports the standard meta-analysis, bootstrap meta-analysis and multivariate meta-analysis functions.
 
-####Enrichment analysis:  
+#### Enrichment analysis:  
 Furthermore, the software uses g: Profiler tool [4] to perform functional enrichment analysis with a given gene list produced from the meta-analysis by using the implemented python module (http://biit.cs.ut.ee/gprofiler/). The software returns multiple files con-taining an output file of gene definitions, a file with statistically signifi-cant enriched GO terms, biological pathways, regulatory motifs in DNA, or phenotype ontologies that these genes are highly enriched and provides to the user the option to visualize results with a Manhattan or a heatmap plot.
 
 ## References
 [1]    	Ramasamy A, Mondry A, Holmes CC, Altman DG. Key issues in conducting a meta-analysis of gene expression microarray datasets. PLoS Med. 2008;5(9):e184. doi:10.1371/journal.pmed.005018
- 
-[2     	Li, Q., N. J. Birkbak, B. Gyorffy, Z. Szallasi and A. C. Eklund (2011). "Jetset: selecting the optimal microarray probe set to represent a gene." BMC Bioinformatics 12: 474.
+[2]     Li, Q., N. J. Birkbak, B. Gyorffy, Z. Szallasi and A. C. Eklund (2011). "Jetset: selecting the optimal microarray probe set to represent a gene." BMC Bioinformatics 12: 474.
 [3]    	Warnat, P., R. Eils and B. Brors (2005). "Cross-platform analysis of cancer microarray data improves gene expression based classification of phenotypes." BMC Bioinformatics 6: 265.
- 
 [4] Uku Raudvere, Liis Kolberg, Ivan Kuzmin, Tambet Arak, Priit Adler, Hedi Peterson, Jaak Vilo: g:Profiler: a web server for functional enrichment anal-ysis and conversions of gene lists (2019 update) Nucleic Acids Research 2019; doi:10.1093/nar/gkz369
