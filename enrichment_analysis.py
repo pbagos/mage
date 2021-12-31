@@ -11,16 +11,16 @@ def run(settings, genes):
     var = gp.profile(organism=p_organism,
                      query=genes,
                      all_results=True,
-                     ordered=True,
+                     ordered=False,
                      combined=False,
                      measure_underrepresentation=False,
                      no_iea=False,
-                     domain_scope='known',
+                     no_evidences=False,
+                     domain_scope='annotated',
                      numeric_namespace='AFFY_HUGENE_1_0_ST_V1',
                      sources=["GO:MF", "GO:CC", "GO:BP", "KEGG", "REAC", "WP", "TF", "MIRNA", "HPA", "CORUM", "HP"],
                      user_threshold=p_threshold,
                      significance_threshold_method=p_threshold_method,
-                     no_evidences=False
                      )
 
     var['negative_log10_of_adjusted_p_value'] = -np.log10(var.p_value)

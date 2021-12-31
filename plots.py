@@ -77,9 +77,9 @@ def multivariate_plots(list1, list2, list3, venn_correction, venn_choice, filepa
     plt.savefig(filepath + "/venn_plot.png")
 
 
-def ea_manhattan_plot(data, filepath, p_threshold):
-    df = data.loc[data.p_value < p_threshold, ['source', 'native', 'p_value', 'negative_log10_of_adjusted_p_value']]
-    df = df.where(df ['negative_log10_of_adjusted_p_value'] <= 16)
+def ea_manhattan_plot(data, filepath):
+    df = data.loc[data.p_value < 0.05, ['source', 'native', 'p_value', 'negative_log10_of_adjusted_p_value']]
+    df = df.where(df ['negative_log10_of_adjusted_p_value']<=16)
     # Generate Manhattan plot: (#optional tweaks for relplot: linewidth=0, s=9)
     df['group_id'] = df.groupby('source').ngroup()
     df.sort_values(['group_id', 'native'], inplace=True)
@@ -103,6 +103,8 @@ def ea_manhattan_plot(data, filepath, p_threshold):
 
 def ea_heatmap_plot(data, filepath):
     # Get unique sources
+    df = data.where(data ['negative_log10_of_adjusted_p_value']<=16)
+    data = df
     sourses = data.source.unique()
 
     # Create a heatmap plot for each source
@@ -119,7 +121,7 @@ def ea_heatmap_plot(data, filepath):
             df.loc[row['native'], row['intersections']] = row['negative_log10_of_adjusted_p_value']
 
         df = df.fillna(0)
-        # print(df)
+        # df = df.where(df ['negative_log10_of_adjusted_p_value']<=16)
         plt.figure("Heatmap plot - " + source, figsize=(30, 15), dpi=80)
         sns.heatmap(df, cmap='RdYlGn_r')
         sns.set(font_scale=1.2)
