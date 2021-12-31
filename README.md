@@ -41,7 +41,7 @@ For meta-analysis, the package supports the standard meta-analysis, bootstrap me
 Furthermore, the software uses g: Profiler tool [4] to perform functional enrichment analysis with a given gene list produced from the meta-analysis by using the implemented python module (http://biit.cs.ut.ee/gprofiler/). The software returns multiple files con-taining an output file of gene definitions, a file with statistically signifi-cant enriched GO terms, biological pathways, regulatory motifs in DNA, or phenotype ontologies that these genes are highly enriched and provides to the user the option to visualize results with a Manhattan or a heatmap plot.
 
 ## References
-[1]    	Ramasamy A, Mondry A, Holmes CC, Altman DG. Key issues in conducting a meta-analysis of gene expression microarray datasets. PLoS Med. 2008;5(9):e184. doi:10.1371/journal.pmed.005018
-[2]     Li, Q., N. J. Birkbak, B. Gyorffy, Z. Szallasi and A. C. Eklund (2011). "Jetset: selecting the optimal microarray probe set to represent a gene." BMC Bioinformatics 12: 474.
-[3]    	Warnat, P., R. Eils and B. Brors (2005). "Cross-platform analysis of cancer microarray data improves gene expression based classification of phenotypes." BMC Bioinformatics 6: 265.
-[4] Uku Raudvere, Liis Kolberg, Ivan Kuzmin, Tambet Arak, Priit Adler, Hedi Peterson, Jaak Vilo: g:Profiler: a web server for functional enrichment anal-ysis and conversions of gene lists (2019 update) Nucleic Acids Research 2019; doi:10.1093/nar/gkz369
+1. Ramasamy A, Mondry A, Holmes CC, Altman DG. Key issues in conducting a meta-analysis of gene expression microarray datasets. PLoS Med. 2008;5(9):e184. doi:10.1371/journal.pmed.005018
+2. Li, Q., N. J. Birkbak, B. Gyorffy, Z. Szallasi and A. C. Eklund (2011). "Jetset: selecting the optimal microarray probe set to represent a gene." BMC Bioinformatics 12: 474.
+3. Warnat, P., R. Eils and B. Brors (2005). "Cross-platform analysis of cancer microarray data improves gene expression based classification of phenotypes." BMC Bioinformatics 6: 265.
+4. Uku Raudvere, Liis Kolberg, Ivan Kuzmin, Tambet Arak, Priit Adler, Hedi Peterson, Jaak Vilo: g:Profiler: a web server for functional enrichment anal-ysis and conversions of gene lists (2019 update) Nucleic Acids Research 2019; doi:10.1093/nar/gkz369
