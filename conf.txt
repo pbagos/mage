@@ -4,7 +4,7 @@
 study_dir = demo_user/studies/
 
 #Study files list separated by comma (,)
-study_files = 1.txt, 2.txt,3.txt, 4.txt, 5.txt,6.txt,7.txt,8.txt,9.txt,10.txt
+study_files = study1.txt, study2.txt,study3.txt, study4.txt, study5.txt,study6.txt,study7.txt,study8.txt,study9.txt,study10.txt
 
 plots = YES
 #Annotation - Define Classes
