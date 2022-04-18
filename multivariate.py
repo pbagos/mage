@@ -539,9 +539,9 @@ def calc_meta_data(expressions_team1, expressions_team2, expressions_team3, num_
 
 def run(settings, data, filepath):
     global controls_multivariate,cases_multivariate1,cases_multivariate2
-    controls_multivariate = settings ['controls_multivariate']
-    cases_multivariate1  = settings ['cases_multivariate1']
-    cases_multivariate2 = settings ['cases_multivariate2']
+    controls_multivariate = settings ['controls']
+    cases_multivariate1  = settings ['cases']
+    cases_multivariate2 = settings ['cases2']
     alpha = float(settings['alpha'])
     venn_correction = settings['venn_correction']
     venn_choice = settings['venn_choice']
