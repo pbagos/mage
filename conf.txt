@@ -2,19 +2,16 @@
 #General options
 #set the folder name contains study files
 study_dir = demo_user/studies/
-#Study files list separated by comma (,)
-#study_files = study1.txt, study2.txt,study3.txt, study4.txt, study5.txt,study6.txt,study7.txt,study8.txt,study9.txt,study10.txt
-#study_files = a1.txt, a2.txt,a3.txt,a4.txt
-#study_files = 1.txt, 2.txt,3.txt,4.txt
-#study_files = 1_mvmeta.txt, 2_mvmeta.txt, 3_mvmeta.txt
-study_files = study1_letter.txt,study2_letter.txt,study3_letter.txt,study4_letter.txt,study5_letter.txt,study6_letter.txt,study7_letter.txt,study8_letter.txt,study9_letter.txt,study10_letter.txt
-plots = YES
 
+#Study files list separated by comma (,)
+study_files = 1.txt, 2.txt,3.txt, 4.txt, 5.txt,6.txt,7.txt,8.txt,9.txt,10.txt
+
+plots = YES
 #Annotation - Define Classes
-controls = control
-cases = case
+controls = 0
+cases = 1
 #only for Multivariate Analysis
-cases2 = case2
+cases2 = 2
 
 #GISU Options
 RUN_GISU = NO
@@ -28,11 +25,11 @@ gene_history_file = data/Gene_History_Reference/gene_history.txt
 homo_sapiens_file = data/Homo_Sapiens_reference/homo_sapiens_gene.txt
 platforms_folder = data/Platforms/
 
-#Analysis Options
+#Meta - Analysis Options
 bootstrap = NO
 num_of_reps = 100
 #Level of Significance of Mulitple Comparisons
-significance_level = 0.05
+significance_level = 0.01
 #one_step , step_down, step_up, all
 multiple_comparisons = all
 
@@ -47,8 +44,8 @@ alpha = 0.05
 multiple_tests = one_step
 
 #Enrichment Analysis Options
-enrichment_analysis = NO
+enrichment_analysis = YES
 organism = hsapiens
-threshold = 0.0001
+threshold = 0.05
 #Default 'fdr'. Other options are 'bonferroni' and 'g_SCS'
 threshold_method = fdr
