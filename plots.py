@@ -6,11 +6,10 @@ import matplotlib.pyplot as plt
 from matplotlib_venn import venn3_circles, venn3
 
 
-def meta_analysis_plots(meta_analysis_df, filepath):
-    alpha = 0.01
+def meta_analysis_plots(meta_analysis_df, filepath,alpha):
 
     # QQ plot
-    plt.figure("QQ plot ")
+    plt.figure("QQ plot ",dpi= 600)
     measurements = meta_analysis_df["Effect size (Hedge's g)"]
     tau = meta_analysis_df['Tau_Squared']
     q = meta_analysis_df['Q']
@@ -19,24 +18,24 @@ def meta_analysis_plots(meta_analysis_df, filepath):
     plt.savefig(filepath + '/qq_plot.png')
 
     # Tau2 plot
-    plt.figure("Tau - Squared DL Histogram ")
-    plt.hist(tau, color='r', density=True, edgecolor='black', linewidth=1.2)
+    plt.figure("Tau - Squared DL Histogram ",dpi= 600)
+    plt.hist(tau, color='r',bins = 20 , density=True, edgecolor='black', linewidth=1.2)
     plt.title("Tau - Squared DL Histogram")
     plt.xlabel('Values')
     plt.ylabel('Frequency')
     plt.savefig(filepath + '/tau2.png')
 
     # Q plot
-    plt.figure("Q Histogram ")
-    plt.hist(q, color='g', density=True, edgecolor='black', linewidth=1.2)
+    plt.figure("Q Histogram ",dpi= 600)
+    plt.hist(q, color='g', density=True, bins = 40,edgecolor='black', linewidth=1.2)
     plt.title("Q Histogram")
     plt.xlabel('Values')
     plt.ylabel('Frequency')
     plt.savefig(filepath + '/q.png')
 
     # I2 plot
-    plt.figure("I - Squared Histogram ")
-    plt.hist(i2, color='b', density=True, edgecolor='black', linewidth=1.2)
+    plt.figure("I - Squared Histogram ",dpi= 600)
+    plt.hist(i2, color='b', density=True, bins = 40, edgecolor='black', linewidth=1.2)
     plt.title("I - Squared DL Histogram ")
     plt.xlabel('Values')
     plt.ylabel('Frequency')
@@ -57,7 +56,7 @@ def meta_analysis_plots(meta_analysis_df, filepath):
         else:
             color.append(1)
 
-    plt.figure("Volcano plot")
+    plt.figure("Volcano plot",dpi= 600)
     plt.scatter(smd, log_p, c=color, cmap='RdYlGn')
     plt.title("Volcano Plot")
     plt.xlabel("Effect Size Hedge's g")
@@ -71,22 +70,25 @@ def multivariate_plots(list1, list2, list3, venn_correction, venn_choice, filepa
     set1 = set(list1)
     set2 = set(list2)
     set3 = set(list3)
+    plt.figure(dpi= 600)
     plt.title("p-values Venn diagram" + " - " + venn_correction + " correction")
     venn3([set1, set2, set3], ('g1', 'g2', venn_choice))
     venn3_circles(subsets=[set1, set2, set3], linestyle='dashed')
     plt.savefig(filepath + "/venn_plot.png")
 
 
-def ea_manhattan_plot(data, filepath):
-    df = data.loc[data.p_value < 0.05, ['source', 'native', 'p_value', 'negative_log10_of_adjusted_p_value']]
-    df = df.where(df ['negative_log10_of_adjusted_p_value']<=16)
+def ea_manhattan_plot(data, filepath,threshold):
+
+    df = data.loc[data.p_value < float(threshold), ['source', 'native', 'p_value', 'negative_log10_of_adjusted_p_value']]
+    df = df.where(df ['negative_log10_of_adjusted_p_value']<=16 )
+    df = df.where(df['source']!='nan')
     # Generate Manhattan plot: (#optional tweaks for relplot: linewidth=0, s=9)
     df['group_id'] = df.groupby('source').ngroup()
     df.sort_values(['group_id', 'native'], inplace=True)
     df.reset_index(inplace=True, drop=True)
     df['i'] = df.index
 
-    plt.subplots(dpi=300)
+    plt.subplots(dpi=600)
     plt.figure("Manhattan plot")
 
     # palette: Paired, Set2, bright, dark, coloblind, deep
@@ -98,6 +100,7 @@ def ea_manhattan_plot(data, filepath):
     plot.fig.suptitle('Enrichment Analysis - Manhattan plot', fontsize=16)
     plot.ax.set_xticks(df.groupby('group_id')['i'].median())
     plot.ax.set_xticklabels(df['source'].unique(), rotation=25)
+    plt.tight_layout()
     plt.savefig(filepath + "/manhattan_plot.png")
 
 
@@ -105,11 +108,21 @@ def ea_heatmap_plot(data, filepath):
     # Get unique sources
     df = data.where(data ['negative_log10_of_adjusted_p_value']<=16)
     data = df
-    sourses = data.source.unique()
+    sourses = list(set(data.source))
+    sourses = [x for x in sourses if str(x) != 'nan']
 
-    # Create a heatmap plot for each source
+    # print(data.head())
+    # # Create a heatmap plot for each source
+    # # print(data['source'])
+    # x= data.where(data['source'] == 'GO:MF')
+    # print(x.dropna()['intersections'])
     for source in sourses:
+        if source == None:
+            sourses.remove(source)
+    for source in sourses:
+        # print(source)
         genes_all = []
+        # x= data.where(data['source'] == source)
         for index, row in data[data.source == source].iterrows():
             genes_all.extend(row['intersections'])
 
@@ -121,8 +134,9 @@ def ea_heatmap_plot(data, filepath):
             df.loc[row['native'], row['intersections']] = row['negative_log10_of_adjusted_p_value']
 
         df = df.fillna(0)
+        # print(df)
         # df = df.where(df ['negative_log10_of_adjusted_p_value']<=16)
-        plt.figure("Heatmap plot - " + source, figsize=(30, 15), dpi=80)
+        plt.figure("Heatmap plot - " + source, figsize=(30, 15), dpi=300)
         sns.heatmap(df, cmap='RdYlGn_r')
         sns.set(font_scale=1.2)
 
