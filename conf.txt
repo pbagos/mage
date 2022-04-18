@@ -4,7 +4,14 @@
 study_dir = demo_user/studies/
 
 #Study files list separated by comma (,)
+# Study files for strandard and bootstrap meta-analysis
 study_files = study1.txt, study2.txt,study3.txt, study4.txt, study5.txt,study6.txt,study7.txt,study8.txt,study9.txt,study10.txt
+
+# Study files for multiple outcomes (multivariate meta-analysis)
+#study_files = a1.txt,a2.txt,a3.txt,a4.txt
+
+
+
 
 plots = YES
 #Annotation - Define Classes
