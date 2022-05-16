@@ -21,6 +21,7 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='[%d/%b/%Y %H:%M:%S]',
                     filemode='a')
 logger = logging.getLogger(__name__)
+import scipy.stats
 
 _INFO_ = """
 PythonMeta
@@ -2511,6 +2512,10 @@ def Stat_ztest(ES, SE, k=0):
 #guess P value for t test and u test
 def Stat_guess_TP(z):
     #from metabase import lmtbl_ttest as lmtbl
+
+
+#find p-value for two-tailed test
+
     lmtbl = lmtbl_ttest()
     seeds=lmtbl.seeds
     lmt_p_t=[]
@@ -2522,11 +2527,12 @@ def Stat_guess_TP(z):
         return "0.000"
     for idx in range(len(lmt_p_t)):
         if z==lmt_p_t[idx] :
-            return '{:.3f}'.format(seeds[idx])
+            return '{:.8f}'.format(seeds[idx])
         if z>lmt_p_t[idx] :
             if z<lmt_p_t[idx+1]:
-                p=seeds[idx+1]-((seeds[idx+1]-seeds[idx])*(lmt_p_t[idx+1]-z))/(lmt_p_t[idx+1]-lmt_p_t[idx])                
-                return '{:.3f}'.format(p)        
+                p= scipy.stats.norm.sf(abs(z))*2
+                # p=seeds[idx+1]-((seeds[idx+1]-seeds[idx])*(lmt_p_t[idx+1]-z))/(lmt_p_t[idx+1]-lmt_p_t[idx])
+                return '{:.8f}'.format(p)
 
 ###########################################
 '''
@@ -3413,7 +3419,8 @@ def DL_Tausqare(studies,type):
     k=len(studies)
     if Q<=k-1 :
         return 0
-
+    if w-ww/w == 0 :
+        return 0
     return max((Q-k+1)/(w-ww/w),0)
 
 #Weight
