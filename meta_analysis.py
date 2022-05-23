@@ -10,7 +10,7 @@ import itertools
 from scipy.stats import norm
 from scipy.stats.distributions import chi2
 from collections import defaultdict
-
+from  statsmodels.stats.multitest import multipletests
 global genes_p_values, meta_analysis_df, study, num_of_studies, effect_size_list, ind1, ind2, all_genes, means1_table, means2_table, genes_for_ea,controls_metan,cases_metan,number_of_gene_studies
 
 genes_p_values = []
@@ -95,8 +95,17 @@ def split_data(dataframe_list):
 
 # this function conducts a meta-analysis (Random models, IV-Heg,and SMD)
 def calc_metadata(expressions_team2, expressions_team1,alpha):
-    study = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-             'V', 'W', 'X', 'Y', 'Z']
+    # study = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+    #          'V', 'W', 'X', 'Y', 'Z']
+    
+    # Define the max number of studies that MAGE can process.
+    study = list(np.arange(10000))
+
+    study2 = []
+    for number in study:
+        #convert each integer to a character sto the PyMeta library can proccess the studies for meta-analysis
+        study2.append(chr(number))
+    study = study2
 
     all_list2 = []
 
@@ -162,7 +171,6 @@ def calc_metadata(expressions_team2, expressions_team1,alpha):
     hash_table2 = dict(res)
     res = {k: v for k, v in hash_table.items() if len(v) >= 1}
     hash_table = res
-
     x = pd.DataFrame(hash_table.values(), index=hash_table.keys()).T
     text = []
     gene_names = x.columns
@@ -197,6 +205,7 @@ def calc_metadata(expressions_team2, expressions_team1,alpha):
             Sp = sqrt(
                 #    (*n1-1)*s1^2                                                (*n2-1)*s2^2
                 ((num_controls - 1) * (row_num[1] ** 2) + (num_cases - 1) * (row_num[4] ** 2)) / (N - 2))
+
             d = (row_num[0] - row_num[3]) / Sp  # effect sizes _d
             g = J * d  # effect size corrected  with Hedge's g
             var_d = N / (num_controls * num_cases) + (d * d) / (2 * N)
@@ -627,8 +636,11 @@ def get_step_up_methods(meta_analysis_df,
     meta_analysis_df = meta_analysis_df.sort_values(by=['p_value'], ascending= False)  # sort by p_value
     p_values = np.float64(np.array(meta_analysis_df['p_value']))
 
-    hochberg = []
+
+
+    hochberg= []
     simes = []
+
     simes.append(p_values[0])
     hochberg.append(p_values[0])
     for i in range(m-1,0,-1):
