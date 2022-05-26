@@ -97,7 +97,7 @@ def split_data(dataframe_list):
 def calc_metadata(expressions_team2, expressions_team1,alpha):
     # study = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
     #          'V', 'W', 'X', 'Y', 'Z']
-    
+
     # Define the max number of studies that MAGE can process.
     study = list(np.arange(10000))
 
@@ -268,6 +268,126 @@ def calc_metadata(expressions_team2, expressions_team1,alpha):
     print ("IRR : " + str(IRR))
     return pd.DataFrame(meta_analysis_df)
 
+def calc_metadata2(expressions_team2, expressions_team1,alpha):
+    # study = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+    #          'V', 'W', 'X', 'Y', 'Z']
+
+    # Define the max number of studies that MAGE can process.
+    study = list(np.arange(10000))
+
+    study2 = []
+    for number in study:
+        #convert each integer to a character sto the PyMeta library can proccess the studies for meta-analysis
+        study2.append(chr(number))
+    study = study2
+
+    all_list2 = []
+
+    for i in range(len(expressions_team1)):
+        genes = expressions_team1[i][0]
+
+        x1 = expressions_team1[i].iloc[:, 1:].mean(axis=1)
+        x2 = expressions_team1[i].iloc[:, 1:].std(axis=1)
+
+        n1 = len(ind2[i])
+        n1 = [n1] * len(x1)
+
+        n1 = pd.DataFrame(n1, columns=["GROUP SIZE"])
+
+        x1 = pd.DataFrame(x1, columns=['MEANS ΤΕΑΜ 1'])
+        x2 = pd.DataFrame(x2, columns=['STANDARD DEVIATIONS ΤΕΑΜ 1'])
+
+        all_1 = pd.concat([genes, x1, x2, n1], axis=1)
+
+        y1 = expressions_team2[i].iloc[:, 1:].mean(axis=1)
+        y2 = expressions_team2[i].iloc[:, 1:].std(axis=1)
+
+        n2 = len(ind1[i])
+        n2 = [n2] * len(y1)
+
+        n2 = pd.DataFrame(n2, columns=["GROUP SIZE"])
+
+        y1 = pd.DataFrame(y1, columns=['MEANS ΤΕΑΜ 2'])
+        y2 = pd.DataFrame(y2, columns=['STANDARD DEVIATIONS ΤΕΑΜ 2'])
+
+        all_2 = pd.concat([y1, y2, n2], axis=1)
+
+        all = pd.concat([all_1, all_2], axis=1)
+        all_list2.append(all)
+    all_info = []
+    all_genes2 = []
+
+    for i in all_list2:
+        all_info.append(i.values.tolist())
+    for i in all_genes:
+        all_genes2.append(i.values.tolist())
+
+    items = []
+
+    for j in all_info:
+        items.append(j)
+
+    # now everything is in the desired dataFrame,but we need to make the genes as keys in hash tables
+    items = list(np.concatenate(items))
+    items = np.array(items)
+
+    hash_table = []
+    for item in items:
+        hash_table.append({item[0]: item[1:]})
+    hash_table = np.array(hash_table)
+
+    res = defaultdict(list)
+    for sub in hash_table:
+        for key in sub:
+            res[key].append(sub[key])
+
+    hash_table = dict(res)
+    hash_table2 = dict(res)
+    res = {k: v for k, v in hash_table.items() if len(v) >= 1}
+    hash_table = res
+    x = pd.DataFrame(hash_table.values(), index=hash_table.keys()).T
+    text = []
+    gene_names = x.columns
+    # print(list(gene_names)) # Every column is a gene
+
+    global counter, index,stat_sign_individ_genes
+
+    non_stat_sign_individ_genes = []
+    stat_sign_individ_genes = []
+    p_value_individ = []
+    # print("Gene\tEffect size (Hedge's g)\tStandard_Error\tQ\tI_Squared\tTau_Squared\tp_Q_value\tz_test_value\tp_value\n")
+    for i in range(len(x.columns)):
+        counter = gene_names[i]
+        index = i
+        column = x.iloc[:, i].dropna()
+        # print(column)
+
+        for i, row in enumerate(column):
+            temp = ",".join(str(x) for x in row)
+            text.append(study[i] + "," + temp)
+            row_num = list(map(float, row))
+
+
+
+            num_cases = row_num [2]
+            num_controls = row_num [5]
+            N = num_cases + num_controls
+            df = N - 2
+
+            global number_of_gene_studies, num_of_cases,num_of_controls
+            number_of_gene_studies = len(column)
+            num_of_cases = row[2]
+            num_of_controls = row[5]
+
+
+        settings = {"datatype": "CONT",  # for CONTinuous data
+                    "models": "Random",  # models: Fixed or Random
+                    "algorithm": "IV-Heg",  # algorithm: IV
+                    "effect": "SMD"}  # effect size: MD, SMD
+        main(text, settings)
+        text = []
+
+    return pd.DataFrame(meta_analysis_df)
 
 # This function helps in the execution for the meta_analysis function,and calls the showresults() function
 def main(stys, settings):
@@ -377,10 +497,12 @@ def bootstrap_analysis(expressions_team1, expressions_team2, means1_table, means
     et1 = np.array(bootstrap(expressions_team1), dtype=object).flatten()
     et2 = np.array(bootstrap(expressions_team2), dtype=object).flatten()
 
+    print (et1)
     # for step in range(0,len(et1),5):   # change it for bigger iterations
     et1_sliced = [et1[i:i + n_of_res] for i in range(0, len(et1), n_of_res)]
     et2_sliced = [et2[i:i + n_of_res] for i in range(0, len(et2), n_of_res)]
 
+    # print(et1_sliced[0])
     # print(len(et1_sliced),len(et1_sliced[0]))
     # print((et1_sliced[0][0].std(axis=1)))
 
@@ -577,6 +699,43 @@ def bootstrap_analysis(expressions_team1, expressions_team2, means1_table, means
     return pd.DataFrame(list_of_boot)
 
 
+def bootstrap_analysis2(expression_team,n):
+
+        boot_df_list =[]
+        def btstrap(a_data_frame):
+            btstr_data = pd.DataFrame(columns=a_data_frame.columns)
+            for a_data in range(a_data_frame.shape[0]):
+                selected_num = random.choice(range(a_data_frame.shape[0]))
+                btstr_data = btstr_data.append(a_data_frame[selected_num : selected_num + 1])
+            return btstr_data
+
+
+        boot_df_list =[]
+        lista =expression_team
+        for dataframe in lista:
+            df = dataframe.T
+            df = df.rename(columns=df.iloc[0]).drop(df.index[0]).reset_index(drop = True)
+            #          a1bg a1bg_as1     a1cf      a2m  a4galt
+            # 0  0.07175  -0.0637   0.0927 -0.00156  -0.253
+            # 1 -0.00749    0.182    0.117   0.0791  0.0246
+            # 2  0.06815   -0.148  -0.0838   0.0443 -0.0369
+            # 3    0.063   -0.176 -0.00781  -0.0961  0.0294
+            # df= df.astype(object)
+            for i in range(n):
+                tmp = btstrap(df)
+
+
+            btstrap_df = tmp.T.reset_index()
+            btstrap_df.columns = range(btstrap_df.shape[1])
+            #         btstrap_df = btstrap_df.reset_index().columns = range(btstrap_df.shape[1])
+
+
+            boot_df_list.append(btstrap_df)
+        return boot_df_list
+
+
+
+
 # With this function we can get the  one step methods (Bonferroni and Sidak)
 def get_one_step_methods(meta_analysis_df,
                          alpha):  # This function takes the Sidak and the Bonferoni multiple test method
@@ -682,8 +841,22 @@ def run(settings, data):
 
     if bootstrap == 'YES':
         print("Bootstrap Option")
-        meta_analysis_df = bootstrap_analysis(expressions_team2, expressions_team1, means1_table, means2_table,
-                                              n=num_of_reps)
+        # meta_analysis_df = bootstrap_analysis(expressions_team2, expressions_team1, means1_table, means2_table,
+        #                                       n=num_of_reps)
+        et1 = bootstrap_analysis2(expressions_team1, n=num_of_reps)
+        et2 = bootstrap_analysis2(expressions_team2, n=num_of_reps)
+
+        et1_new = []
+        et2_new = []
+        for df in et1:
+            tmp = df.iloc[:,1:].apply(pd.to_numeric)
+            et1_new.append(pd.concat([df[0],tmp], axis=1))
+        for df in et2:
+            tmp = df.iloc[:,1:].apply(pd.to_numeric)
+            et2_new.append(pd.concat([df[0],tmp], axis=1))
+
+
+        meta_analysis_df = calc_metadata2(et1_new, et2_new, alpha)
     else:
 
         meta_analysis_df = calc_metadata(expressions_team1, expressions_team2, alpha)
