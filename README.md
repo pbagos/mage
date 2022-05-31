@@ -29,25 +29,31 @@ Requirements
 
 1)	Download MAGE from: https://github.com/pbagos/mage
 
-Otherwise, you can run MAGE from its online infrastructure at: http://www.compgen.org/tools/mage (Mozila Firefox browser is suggested)
+    Otherwise, you can run MAGE from its online infrastructure at: http://www.compgen.org/tools/mage (Mozila Firefox browser is suggested)
 
 2)	After downloading the .zip folder of MAGE from GitHub, extract it to a working directory. 
 
 3)	Το install the requirements, pip needs to be installed. Download the script for pip, from: https://bootstrap.pypa.io/get-pip.py.
 
 4)	Open a terminal/command prompt, cd to the folder containing the get-pip.py file and run:
-python get-pip.py
+    
+    python get-pip.py
 
 5)	To install the mentioned requirements with pip, open a terminal/command prompt and run:
-  pip install -r /path/to/requirements.txt
+    
+    pip install -r /path/to/requirements.txt
 
 6)	To execute MAGE, execute with:
-  python mage.py  -c conf.txt  -o results/
+   
+
+    python mage.py  -c conf.txt  -o results/
 
 ## Arguments and options
 MAGE provides the following command-line arguments:
--c: The configuration (.txt) file which contains the settings selected from the user.
--o: The output file where the user wants to store the results extracted from MAGE
+  
+  -c: The configuration (.txt) file which contains the settings selected from the user.
+  
+  -o: The output file where the user wants to store the results extracted from MAGE
 
 
 ## Methods
