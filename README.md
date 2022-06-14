@@ -4,14 +4,14 @@ MAGE :: Meta-Analysis of Gene Expression
 ## Introduction
 MAGE, an acronym for Meta-Analysis of Gene Expression is a tool developed for gene expression analysis.
 
-The overall aim of this work has been to develop a software tool that would offer a large collection of meta-analysis options, as well as several extensions to evaluate the software applied to various biological problems. The M.A.G.E framework is characterized by:
+The overall aim of this work has been to develop a software tool that would offer a large collection of meta-analysis options, as well as several extensions to evaluate the software applied to various biological problems. The MAGE framework is characterized by:
 Speed: It takes a small amount of time to perform the functions which are included 
 Effectiveness: It gives reliable estimations and results, thanks to the mathematical models which are implemented.
 Compatibility: It can be executed either from a Windows or a UNIX operating system.             
 
-Also, there is no need for the user to be expert of any programming or computer science knowledge to run M.A.G.E.
+Also, there is no need for the user to be expert of any programming or computer science knowledge to run MAGE.
 
-M.A.G.E is a Python package that can be run from the command line. M.A.G.E is written in Python (ver. 3.7.9) and requires the following Python libraries and packages to run:
+MAGE is a Python package that can be run from the command line. MAGE is written in Python (ver. 3.7.9) and requires the following Python libraries and packages to run:
 
 Requirements
 - Pandas~=1.2.4
