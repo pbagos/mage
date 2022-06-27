@@ -139,6 +139,8 @@ def calc_metadata(expressions_team2, expressions_team1,alpha):
         all_2 = pd.concat([y1, y2, n2], axis=1)
 
         all = pd.concat([all_1, all_2], axis=1)
+       # all  = all [(all['STANDARD DEVIATIONS ΤΕΑΜ 1']!= 0.0) &  (all['STANDARD DEVIATIONS ΤΕΑΜ 2']!= 0.0) ]
+        # print(all.head())
         all_list2.append(all)
     all_info = []
     all_genes2 = []
@@ -182,13 +184,30 @@ def calc_metadata(expressions_team2, expressions_team1,alpha):
     stat_sign_individ_genes = []
     p_value_individ = []
     # print("Gene\tEffect size (Hedge's g)\tStandard_Error\tQ\tI_Squared\tTau_Squared\tp_Q_value\tz_test_value\tp_value\n")
+
     for i in range(len(x.columns)):
+        stan1 = []
+        stan2 = []
         counter = gene_names[i]
         index = i
         column = x.iloc[:, i].dropna()
-        # print(column)
+        # print (pd.DataFrame(column.head()))
 
         for i, row in enumerate(column):
+            stan1.append(row[1])
+            stan2.append(row[4])
+
+        max_stan1 = max(stan1)
+        max_stan2 = max(stan2)
+        # print('MAX:'+str(max_stan1)+','+str(max_stan2))
+        for i, row in enumerate(column):
+            # print(row)
+            if (row[1] == '0.0') and (row[4] == '0.0') :
+                        # print('YES')
+                        row[1] =  max_stan1
+                        row[4] = max_stan2
+
+            # print(row[1],row[4])
             temp = ",".join(str(x) for x in row)
             text.append(study[i] + "," + temp)
             # print(text)
@@ -205,8 +224,10 @@ def calc_metadata(expressions_team2, expressions_team1,alpha):
             Sp = sqrt(
                 #    (*n1-1)*s1^2                                                (*n2-1)*s2^2
                 ((num_controls - 1) * (row_num[1] ** 2) + (num_cases - 1) * (row_num[4] ** 2)) / (N - 2))
-
-            d = (row_num[0] - row_num[3]) / Sp  # effect sizes _d
+            if( Sp ==0):
+                d= 0
+            else:
+                d = (row_num[0] - row_num[3]) / Sp  # effect sizes _d
             g = J * d  # effect size corrected  with Hedge's g
             var_d = N / (num_controls * num_cases) + (d * d) / (2 * N)
             var_g = J * J * var_d
@@ -222,13 +243,24 @@ def calc_metadata(expressions_team2, expressions_team1,alpha):
             num_of_cases = row[2]
             num_of_controls = row[5]
 
+
+        # # remove records with sd = 0.0
+        # for record in text:
+        #         # print(record.split(','))
+        #         if (record.split(',')[2] == '0.0') and (record.split(',')[5] == '0.0'):
+        #
+        #             text.remove(record)
+        #             # break
+
+
         if np.array(p_value_individ).all() > alpha:
             non_stat_sign_individ_genes.append(counter)
 
         if any(p_value_individual < alpha  for p_value_individual in p_value_individ):
             stat_sign_individ_genes.append(counter)
-        # if np.array(p_value_individ).all() > 0.05:
-        #     stat_sign_individ_genes.append(counter)
+        if np.array(p_value_individ).all() > 0.05:
+            stat_sign_individ_genes.append(counter)
+
         settings = {"datatype": "CONT",  # for CONTinuous data
                     "models": "Random",  # models: Fixed or Random
                     "algorithm": "IV-Heg",  # algorithm: IV
@@ -418,12 +450,17 @@ def main(stys, settings):
 def showresults(rults):
     text = "%-10s %-6s  %-18s %-10s" % ("Study ID", "n", "ES[95% CI]", "Weight(%)\n")
 
-    text1 = str(counter) + "\t" + str(rults[0][1]) + "\t" + str(abs(rults[0][1] / rults[0][10])) + "\t" + str(
+    # if (rults[0][10] == 0):
+    #     rults[0][10]= 0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
+    #     #SE_score = 0
+    # # else :
+    # SE_score = abs(rults[0][1] / rults[0][10])
+    text1 = str(counter) + "\t" + str(rults[0][1]) + "\t" + str(rults[0][6]) + "\t" + str(
         rults[0][7]) + "\t" + str(round(rults[0][9], 2)) + "%\t" + str((rults[0][12])) + "\t" + str(
         (rults[0][8])) + "\t" + str(rults[0][10]) + "\t" + str(rults[0][11] +"\t"+str(rults[0][5]) )
     new_row = {'Genes': counter, 'p_value': rults[0][11]}
     new_row2 = {'Genes': counter, "Effect size (Hedge's g)": rults[0][1],
-                'Standard_Error': abs(rults[0][1] / rults[0][10]), 'Q': rults[0][7], 'I_Squared': round(rults[0][9], 2),
+                'Standard_Error': rults[0][6], 'Q': rults[0][7], 'I_Squared': round(rults[0][9], 2),
                 'Tau_Squared': rults[0][12], 'p_Q_value': rults[0][8], 'z_test_value': rults[0][10],
                 'p_value': rults[0][11], 'num_of_studies': number_of_gene_studies , 'cases': num_of_cases, 'controls':num_of_controls}
     genes_p_values.append(new_row)
