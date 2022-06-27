@@ -120,7 +120,7 @@ def ea_heatmap_plot(data, filepath):
         if source == None:
             sourses.remove(source)
     for source in sourses:
-        # print(source)
+        print('Heatmap for: '+source)
         genes_all = []
         # x= data.where(data['source'] == source)
         for index, row in data[data.source == source].iterrows():
