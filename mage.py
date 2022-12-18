@@ -8,6 +8,7 @@ import time
 import gisu
 import meta_analysis
 import multivariate
+import os
 import plots
 import enrichment_analysis
 
@@ -53,12 +54,14 @@ if __name__ == '__main__':
     filepath = args.o
 
     print("Loading File data")
-    file_list = list(settings['study_files'].split(","))
+    #file_list = list(settings['study_files'].split(","))
+    file_list = os.listdir(settings['study_dir'])
+    print(file_list)
     alpha = float(settings['significance_level'])
     for i in range(len(file_list)):
         # Read file data
-        studypath = settings['study_dir'] + file_list[i].strip()
-        file = pd.read_csv(studypath, sep='\t', low_memory=False, header=None)
+        studypath = settings['study_dir'] +'/'+ file_list[i].strip()
+        file = pd.read_csv(studypath, sep='\t', low_memory=False, header=None,encoding = 'unicode_escape')
         studies.append(file)
 
     if settings.get('run_gisu') == 'YES':
@@ -66,7 +69,10 @@ if __name__ == '__main__':
         platforms = list(settings['platform'].split(","))
 
         for study in studies:
-            study_transform = gisu.run(settings, study, platforms[i])
+            if settings['updated_genes'] == 'YES':
+                study_transform = gisu.run_updated_genes(settings, study)
+            else:
+                study_transform = gisu.run(settings, study, platforms[i])
             studies_transform.append(study_transform)
         data = studies_transform
     else:
@@ -79,7 +85,14 @@ if __name__ == '__main__':
     else:
         print('Meta-analysis started')
         metanalysis_df = meta_analysis.run(settings, data)
-        metanalysis_df.to_csv(filepath + 'meta_analysis_results.txt', sep='\t', mode='w')
+        if settings ['bayesian_meta_analysis'] == 'YES':
+            print('Bayesian Meta-analysis started')
+            metanalysis_df.to_csv(filepath + 'bayesian_meta_analysis_results.txt', sep='\t', mode='w')
+            print('Bayesian Meta-analysis finished')
+
+            exit()
+        else:
+            metanalysis_df.to_csv(filepath + 'meta_analysis_results.txt', sep='\t', mode='w')
 
         # create and save plots
         if settings.get('plots') == 'YES':
@@ -88,9 +101,13 @@ if __name__ == '__main__':
     if settings.get('enrichment_analysis') == 'YES':
         print('Enrichment Analysis started')
 
+
+
         genes_for_ea = metanalysis_df['genes_step_up'].where(
             np.array(metanalysis_df['p_values_step_up'], dtype=float) < np.array(metanalysis_df['simes'], dtype=float) ).dropna().tolist()
         print(str(len(genes_for_ea))+' genes for Enrichment Analysis')
+
+        pd.DataFrame(genes_for_ea).to_csv(filepath + 'stat_significant_genes.txt', sep='\t', mode='w')
         enrichment_analysis_df = enrichment_analysis.run(settings, genes_for_ea)
         enrichment_analysis_df.to_csv(filepath + 'enrichment_analysis_results.txt',
                                       header=enrichment_analysis_df.columns, index=None, sep='\t', mode='w')
