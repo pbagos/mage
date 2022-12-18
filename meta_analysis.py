@@ -10,14 +10,17 @@ import itertools
 from scipy.stats import norm
 from scipy.stats.distributions import chi2
 from collections import defaultdict
-from  statsmodels.stats.multitest import multipletests
-global genes_p_values, meta_analysis_df, study, num_of_studies, effect_size_list, ind1, ind2, all_genes, means1_table, means2_table, genes_for_ea,controls_metan,cases_metan,number_of_gene_studies
+from statistics import mean
+from statsmodels.stats.multitest import multipletests
+
+global genes_p_values, meta_analysis_df, study, num_of_studies, effect_size_list, ind1, ind2, all_genes, means1_table, means2_table, genes_for_ea, controls_metan, cases_metan, number_of_gene_studies
 
 genes_p_values = []
 meta_analysis_df = []
 ind1 = []
 ind2 = []
 all_genes = []
+
 
 # With this function we load our data. We need a list which will contain
 # the filepaths of each study (txt and tab delimeted)
@@ -30,6 +33,8 @@ def split_data(dataframe_list):
     means2_table = []
     for df in dataframe_list:
         # take the unique list annotation symbols
+        df = df.dropna()
+
         gene_of_study = df.iloc[2:, 0].reset_index(drop=True)
         gene_of_study = gene_of_study.to_frame()
 
@@ -43,8 +48,6 @@ def split_data(dataframe_list):
         # concat expressions with the genes
         new_df1 = pd.concat([gene_of_study, data_team1], axis=1)
         expressions_team1.append(new_df1)
-
-
         # expressions team2
         data_team2 = df.iloc[2:][team_cols2].astype(float).reset_index(drop=True)
 
@@ -94,7 +97,7 @@ def split_data(dataframe_list):
 
 
 # this function conducts a meta-analysis (Random models, IV-Heg,and SMD)
-def calc_metadata(expressions_team2, expressions_team1,alpha):
+def calc_metadata(expressions_team2, expressions_team1, alpha):
     # study = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
     #          'V', 'W', 'X', 'Y', 'Z']
 
@@ -103,7 +106,7 @@ def calc_metadata(expressions_team2, expressions_team1,alpha):
 
     study2 = []
     for number in study:
-        #convert each integer to a character sto the PyMeta library can proccess the studies for meta-analysis
+        # convert each integer to a character sto the PyMeta library can proccess the studies for meta-analysis
         study2.append(chr(number))
     study = study2
 
@@ -139,7 +142,7 @@ def calc_metadata(expressions_team2, expressions_team1,alpha):
         all_2 = pd.concat([y1, y2, n2], axis=1)
 
         all = pd.concat([all_1, all_2], axis=1)
-       # all  = all [(all['STANDARD DEVIATIONS ΤΕΑΜ 1']!= 0.0) &  (all['STANDARD DEVIATIONS ΤΕΑΜ 2']!= 0.0) ]
+        # all  = all [(all['STANDARD DEVIATIONS ΤΕΑΜ 1']!= 0.0) &  (all['STANDARD DEVIATIONS ΤΕΑΜ 2']!= 0.0) ]
         # print(all.head())
         all_list2.append(all)
     all_info = []
@@ -178,7 +181,7 @@ def calc_metadata(expressions_team2, expressions_team1,alpha):
     gene_names = x.columns
     # print(list(gene_names)) # Every column is a gene
 
-    global counter, index,stat_sign_individ_genes
+    global counter, index, stat_sign_individ_genes
 
     non_stat_sign_individ_genes = []
     stat_sign_individ_genes = []
@@ -202,10 +205,10 @@ def calc_metadata(expressions_team2, expressions_team1,alpha):
         # print('MAX:'+str(max_stan1)+','+str(max_stan2))
         for i, row in enumerate(column):
             # print(row)
-            if (row[1] == '0.0') and (row[4] == '0.0') :
-                        # print('YES')
-                        row[1] =  max_stan1
-                        row[4] = max_stan2
+            if (row[1] == '0.0') and (row[4] == '0.0'):
+                # print('YES')
+                row[1] = max_stan1
+                row[4] = max_stan2
 
             # print(row[1],row[4])
             temp = ",".join(str(x) for x in row)
@@ -214,35 +217,32 @@ def calc_metadata(expressions_team2, expressions_team1,alpha):
 
             row_num = list(map(float, row))
 
-                # calculate IDR and IRR
+            # calculate IDR and IRR
 
-            num_cases = row_num [2]
-            num_controls = row_num [5]
-            N = num_cases + num_controls
-            df = N - 2
-            J = (math.gamma(df / 2) / (math.sqrt(df / 2) * math.gamma((df - 1) / 2)))
-            Sp = sqrt(
-                #    (*n1-1)*s1^2                                                (*n2-1)*s2^2
-                ((num_controls - 1) * (row_num[1] ** 2) + (num_cases - 1) * (row_num[4] ** 2)) / (N - 2))
-            if( Sp ==0):
-                d= 0
-            else:
-                d = (row_num[0] - row_num[3]) / Sp  # effect sizes _d
-            g = J * d  # effect size corrected  with Hedge's g
-            var_d = N / (num_controls * num_cases) + (d * d) / (2 * N)
-            var_g = J * J * var_d
+            num_cases = row_num[2]
+            num_controls = row_num[5]
+            # N = num_cases + num_controls
+            # df = N - 2
+            # J = (math.gamma(df / 2) / (math.sqrt(df / 2) * math.gamma((df - 1) / 2)))
+            # Sp = sqrt(
+            #     #    (*n1-1)*s1^2                                                (*n2-1)*s2^2
+            #     ((num_controls - 1) * (row_num[1] ** 2) + (num_cases - 1) * (row_num[4] ** 2)) / (N - 2))
+            # if (Sp == 0):
+            #     d = 0
+            # else:
+            #     d = (row_num[0] - row_num[3]) / Sp  # effect sizes _d
+            # g = J * d  # effect size corrected  with Hedge's g
+            # var_d = N / (num_controls * num_cases) + (d * d) / (2 * N)
+            # var_g = J * J * var_d
+            #
+            # z = g / var_g
+            # p_value = 1 - norm.cdf(abs(z))
+            # p_value_individ.append(p_value)
 
-            z = g / var_g
-            p_value = 1 - norm.cdf(abs(z))
-            p_value_individ.append(p_value)
-
-
-
-            global number_of_gene_studies, num_of_cases,num_of_controls
+            global number_of_gene_studies, num_of_cases, num_of_controls
             number_of_gene_studies = len(column)
             num_of_cases = row[2]
             num_of_controls = row[5]
-
 
         # # remove records with sd = 0.0
         # for record in text:
@@ -252,55 +252,307 @@ def calc_metadata(expressions_team2, expressions_team1,alpha):
         #             text.remove(record)
         #             # break
 
-
-        if np.array(p_value_individ).all() > alpha:
-            non_stat_sign_individ_genes.append(counter)
-
-        if any(p_value_individual < alpha  for p_value_individual in p_value_individ):
-            stat_sign_individ_genes.append(counter)
-        if np.array(p_value_individ).all() > 0.05:
-            stat_sign_individ_genes.append(counter)
+        # if np.array(p_value_individ).all() > alpha:
+        #     non_stat_sign_individ_genes.append(counter)
+        #
+        # if any(p_value_individual < alpha for p_value_individual in p_value_individ):
+        #     stat_sign_individ_genes.append(counter)
+        # if np.array(p_value_individ).all() > 0.05:
+        #     stat_sign_individ_genes.append(counter)
 
         settings = {"datatype": "CONT",  # for CONTinuous data
                     "models": "Random",  # models: Fixed or Random
                     "algorithm": "IV-Heg",  # algorithm: IV
+
                     "effect": "SMD"}  # effect size: MD, SMD
+        text = [ x for x in text if 'nan' not in x ]
+
+
+
         main(text, settings)
         text = []
-        p_value_individ= []
+        p_value_individ = []
     meta_analysis_df2 = pd.DataFrame(meta_analysis_df)
 
-    num_of_non_stat_sign_genes_individ = len(non_stat_sign_individ_genes)
-    stat_sign_genes_metan = meta_analysis_df2['Genes'].where(np.array(meta_analysis_df2['p_value'], dtype=float) < alpha).dropna().tolist()
-
-
-    num_of_stat_sign_genes_individ = len(stat_sign_individ_genes)
-    non_stat_sign_genes_metan = meta_analysis_df2['Genes'].where(np.array(meta_analysis_df2['p_value'], dtype=float) > alpha).dropna().tolist()
-
-    len_of_common_genes_IDR  =0
-    for i in range(len(non_stat_sign_individ_genes)):
-        if  non_stat_sign_individ_genes[i] in stat_sign_genes_metan:
-            len_of_common_genes_IDR+=1
-
-    len_of_common_genes_IRR = 0
-    for i in range(len(stat_sign_individ_genes)):
-        if stat_sign_individ_genes[i] in non_stat_sign_genes_metan:
-            len_of_common_genes_IRR += 1
-
-    IDR =   len_of_common_genes_IDR/len(stat_sign_genes_metan)
-    # print (num_of_stat_sign_genes_metan,num_of_non_stat_sign_genes_individ)
-
-    IRR =  len_of_common_genes_IRR / len(stat_sign_individ_genes)
-
-    # print (num_of_non_stat_sign_genes_metan ,num_of_stat_sign_genes_individ)
-
-
-    # print(num_of_stat_sign_genes_metan,num_of_non_stat_sign_genes_individ)
-    print ("IDR : " +str(IDR))
-    print ("IRR : " + str(IRR))
+    # num_of_non_stat_sign_genes_individ = len(non_stat_sign_individ_genes)
+    # stat_sign_genes_metan = meta_analysis_df2['Genes'].where(
+    #     np.array(meta_analysis_df2['p_value'], dtype=float) < alpha).dropna().tolist()
+    #
+    # num_of_stat_sign_genes_individ = len(stat_sign_individ_genes)
+    # non_stat_sign_genes_metan = meta_analysis_df2['Genes'].where(
+    #     np.array(meta_analysis_df2['p_value'], dtype=float) > alpha).dropna().tolist()
+    #
+    # len_of_common_genes_IDR = 0
+    # for i in range(len(non_stat_sign_individ_genes)):
+    #     if non_stat_sign_individ_genes[i] in stat_sign_genes_metan:
+    #         len_of_common_genes_IDR += 1
+    #
+    # len_of_common_genes_IRR = 0
+    # for i in range(len(stat_sign_individ_genes)):
+    #     if stat_sign_individ_genes[i] in non_stat_sign_genes_metan:
+    #         len_of_common_genes_IRR += 1
+    #
+    # IDR = len_of_common_genes_IDR / len(stat_sign_genes_metan)
+    # # print (num_of_stat_sign_genes_metan,num_of_non_stat_sign_genes_individ)
+    #
+    # IRR = len_of_common_genes_IRR / len(stat_sign_individ_genes)
+    #
+    # # print (num_of_non_stat_sign_genes_metan ,num_of_stat_sign_genes_individ)
+    #
+    # # print(num_of_stat_sign_genes_metan,num_of_non_stat_sign_genes_individ)
+    # print("IDR : " + str(IDR))
+    # print("IRR : " + str(IRR))
     return pd.DataFrame(meta_analysis_df)
 
-def calc_metadata2(expressions_team2, expressions_team1,alpha):
+
+# this function conducts a Βayesian meta-analysis (Random models, IV-Heg,and SMD)
+def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
+    # study = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+    #          'V', 'W', 'X', 'Y', 'Z']
+
+    # Define the max number of studies that MAGE can process.
+    study = list(np.arange(10000))
+
+    # Receive a and b values from the user
+
+
+    study2 = []
+    for number in study:
+        # convert each integer to a character sto the PyMeta library can proccess the studies for meta-analysis
+        study2.append(chr(number))
+    study = study2
+
+    all_list2 = []
+
+    for i in range(len(expressions_team1)):
+        genes = expressions_team1[i][0]
+
+        x1 = expressions_team1[i].iloc[:, 1:].mean(axis=1)
+        x2 = expressions_team1[i].iloc[:, 1:].std(axis=1)
+
+        n1 = len(ind2[i])
+        n1 = [n1] * len(x1)
+
+        n1 = pd.DataFrame(n1, columns=["GROUP SIZE"])
+
+        x1 = pd.DataFrame(x1, columns=['MEANS ΤΕΑΜ 1'])
+        x2 = pd.DataFrame(x2, columns=['STANDARD DEVIATIONS ΤΕΑΜ 1'])
+
+        all_1 = pd.concat([genes, x1, x2, n1], axis=1)
+
+        y1 = expressions_team2[i].iloc[:, 1:].mean(axis=1)
+        y2 = expressions_team2[i].iloc[:, 1:].std(axis=1)
+
+        n2 = len(ind1[i])
+        n2 = [n2] * len(y1)
+
+        n2 = pd.DataFrame(n2, columns=["GROUP SIZE"])
+
+        y1 = pd.DataFrame(y1, columns=['MEANS ΤΕΑΜ 2'])
+        y2 = pd.DataFrame(y2, columns=['STANDARD DEVIATIONS ΤΕΑΜ 2'])
+
+        all_2 = pd.concat([y1, y2, n2], axis=1)
+
+        all = pd.concat([all_1, all_2], axis=1)
+        # all  = all [(all['STANDARD DEVIATIONS ΤΕΑΜ 1']!= 0.0) &  (all['STANDARD DEVIATIONS ΤΕΑΜ 2']!= 0.0) ]
+        # print(all.head())
+        all_list2.append(all)
+    all_info = []
+    all_genes2 = []
+
+    for i in all_list2:
+        all_info.append(i.values.tolist())
+    for i in all_genes:
+        all_genes2.append(i.values.tolist())
+
+    items = []
+
+    for j in all_info:
+        items.append(j)
+
+    # now everything is in the desired dataFrame,but we need to make the genes as keys in hash tables
+    items = list(np.concatenate(items))
+    items = np.array(items)
+
+    hash_table = []
+    for item in items:
+        hash_table.append({item[0]: item[1:]})
+    hash_table = np.array(hash_table)
+
+    res = defaultdict(list)
+    for sub in hash_table:
+        for key in sub:
+            res[key].append(sub[key])
+
+    hash_table = dict(res)
+    hash_table2 = dict(res)
+    res = {k: v for k, v in hash_table.items() if len(v) >= 1}
+    hash_table = res
+    x = pd.DataFrame(hash_table.values(), index=hash_table.keys()).T
+    text = []
+    gene_names = x.columns
+    # print(list(gene_names)) # Every column is a gene
+
+    global counter, index, stat_sign_individ_genes
+    E_m_list = []
+    V_t_list = []
+    E_t_list  = []
+    V_m_list = []
+    CI_low = []
+    CI_up = []
+    g_list = []
+    for i in range(len(x.columns)):
+        # Initialize lists for bayesian meta-analysis
+
+        # Means
+        mean1 = []
+        mean2 = []
+
+        # Standard Deviations
+        stan1 = []
+        stan2 = []
+
+        # Participants of each group
+
+        n_i = []  # mean number of participans
+
+        ste = []
+        y_i = []
+        counter = gene_names[i]
+        index = i
+        column = x.iloc[:, i].dropna()
+        # print (pd.DataFrame(column.head()))
+
+        for i, row in enumerate(column):
+            # Standard deviation append
+            stan1.append(row[1])
+            stan2.append(row[4])
+        max_stan1 = max(stan1)
+        max_stan2 = max(stan2)
+        for i, row in enumerate(column):
+
+            # print(row)
+            if (row[1] == '0.0') and (row[4] == '0.0'):
+                # print('YES')
+                row[1] = max_stan1
+                row[4] = max_stan2
+
+            row = [float(x) for x in row]
+            # Number of participants append
+            n1 = row[2]
+            n2 = row[5]
+
+            N = int(row[2]) + int(row[5])
+            df = N - 2
+            sd1 = float(row[1])
+            sd2 = float(row[4])
+            s = math.sqrt(((float(row[2]) - 1) * sd1 * sd1 + (float(row[5]) - 1) * sd2 * sd2) / (N - 2))
+
+            m1 = float(row[0])
+            m2 = float(row[3])
+            md = m1 - m2
+            # smd=md*(1-3/(4*N-9))/s
+            J = (math.gamma(df / 2) / (math.sqrt(df / 2) * math.gamma((df - 1) / 2)))
+            n_i.append((row[2] * row[5]) / (row[2] + row[5]))
+
+            smd = md * J / s  # SMD with gamma function
+            se = (J * J) * math.sqrt(N / (n1 * n2) + (smd * smd) / (2 * (N - 2)))
+
+            # Mean append
+            y_i.append(smd)
+
+            ste.append(se)
+
+
+
+        # len of studies that participate in the bayesian meta-analysis
+        k = len(y_i)
+
+        # Posterior variance of the population effect
+
+        # V(μ) =  2 (1+bRSS/2) / b*k *(2*a +k -3)
+        # RSSb = Σ yi**2 - k* mean(y)**2
+        RSSb = 0
+        mean_y_i = mean(y_i)
+        # max_stan1 = max(stan1)
+        # max_stan2 = max(stan2)
+
+        for i in range(len(y_i)):
+            RSSb += y_i[i] ** 2 - k * mean_y_i ** 2
+
+
+        #posterior expectation of the population parameter μ
+
+        first_big_sum = 0
+
+        for i in range (len(y_i)):
+            sens_part1 = (n_i[i] -3) # Sensitive part for zero divisions
+            if sens_part1 == 0.0:
+                sens_part1 = 0.000000001
+
+
+
+            first_big_sum+= ( (n_i[i]*ste[i]*ste[i])/sens_part1 )* ((mean_y_i*(k-3)+y_i[i])/k  -  ( (mean_y_i**2 *(mean_y_i-y_i[i]) + mean_y_i*y_i[i]**2)*(k+2*a+1)*b)/(2*(1+b*RSSb/2)) )
+        second_big_sum = 0
+        for i in range (len(y_i)):
+            sens_part1 = (n_i[i] -3) # Sensitive part for zero divisions
+            if sens_part1 == 0.0:
+                sens_part1 = 0.000000001
+
+            second_big_sum+= ( (n_i[i]*ste[i]*ste[i])/sens_part1)* ((k-1)/k  -  ( (mean_y_i*(mean_y_i-y_i[i]) + y_i[i]**2)*(k+2*a+1)*b)/(2*(1+b*RSSb/2)) )
+
+        upper_part = mean_y_i - ((b*(k+2*a-1))/(2*(1+b*RSSb/2))) * first_big_sum
+
+
+        lower_part = 1 - ((b*(k+2*a-1))/(2*(1+b*RSSb/2))) * second_big_sum
+
+
+        E_m = upper_part/lower_part
+        sens_part2 =  b*k*(2*a+k-3)
+        if (sens_part2 == 0 ):
+            sens_part2 = 0.000000001
+
+        sens_part3 =  b*(2*a+k-3)
+        if (sens_part3 == 0 ):
+            sens_part3 = 0.000000001
+
+
+        V_mu = (2 *(1+b*RSSb/2))/(sens_part2)
+
+        E_tau_square = (2 *(1+b*RSSb/2))/(sens_part3)
+
+        sens_part4 =  b**2*(2*a+k-3)**2*(k+2*a-5)
+        if (sens_part4 == 0 ):
+            sens_part4 = 0.000000001
+
+        V_tau_square =(8 *(1+b*RSSb/2)**2)/(sens_part4)
+
+
+
+        conf_int_up =   E_m + 1.96*math.sqrt(abs(V_mu))
+        conf_int_lower = E_m - 1.96*math.sqrt(abs(V_mu))
+
+        # E_m_list = []
+        # V_t_list = []
+        # E_t_list  = []
+        # V_m_list = []
+        # CI_low = []
+        # CI_up = []
+        g_list.append(counter)
+        E_m_list.append(E_m)
+        E_t_list.append(E_tau_square)
+        V_m_list.append(V_mu)
+        V_t_list.append(V_tau_square)
+        CI_low.append(conf_int_lower)
+        CI_up.append(conf_int_up)
+
+    bayesian_df = pd.DataFrame(list(zip(g_list,E_m_list,V_m_list,E_t_list,V_t_list,CI_low,CI_up)),columns=['Gene','E(mu)','V(mu)','E(tau-square)','V(tau-square)','CI_95%_low','CI_95%_up' ])
+    return bayesian_df
+
+
+
+
+def calc_metadata2(expressions_team2, expressions_team1, alpha):
     # study = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
     #          'V', 'W', 'X', 'Y', 'Z']
 
@@ -309,7 +561,7 @@ def calc_metadata2(expressions_team2, expressions_team1,alpha):
 
     study2 = []
     for number in study:
-        #convert each integer to a character sto the PyMeta library can proccess the studies for meta-analysis
+        # convert each integer to a character sto the PyMeta library can proccess the studies for meta-analysis
         study2.append(chr(number))
     study = study2
 
@@ -382,7 +634,7 @@ def calc_metadata2(expressions_team2, expressions_team1,alpha):
     gene_names = x.columns
     # print(list(gene_names)) # Every column is a gene
 
-    global counter, index,stat_sign_individ_genes
+    global counter, index, stat_sign_individ_genes
 
     non_stat_sign_individ_genes = []
     stat_sign_individ_genes = []
@@ -399,18 +651,15 @@ def calc_metadata2(expressions_team2, expressions_team1,alpha):
             text.append(study[i] + "," + temp)
             row_num = list(map(float, row))
 
-
-
-            num_cases = row_num [2]
-            num_controls = row_num [5]
+            num_cases = row_num[2]
+            num_controls = row_num[5]
             N = num_cases + num_controls
             df = N - 2
 
-            global number_of_gene_studies, num_of_cases,num_of_controls
+            global number_of_gene_studies, num_of_cases, num_of_controls
             number_of_gene_studies = len(column)
             num_of_cases = row[2]
             num_of_controls = row[5]
-
 
         settings = {"datatype": "CONT",  # for CONTinuous data
                     "models": "Random",  # models: Fixed or Random
@@ -420,6 +669,7 @@ def calc_metadata2(expressions_team2, expressions_team1,alpha):
         text = []
 
     return pd.DataFrame(meta_analysis_df)
+
 
 # This function helps in the execution for the meta_analysis function,and calls the showresults() function
 def main(stys, settings):
@@ -457,12 +707,13 @@ def showresults(rults):
     # SE_score = abs(rults[0][1] / rults[0][10])
     text1 = str(counter) + "\t" + str(rults[0][1]) + "\t" + str(rults[0][6]) + "\t" + str(
         rults[0][7]) + "\t" + str(round(rults[0][9], 2)) + "%\t" + str((rults[0][12])) + "\t" + str(
-        (rults[0][8])) + "\t" + str(rults[0][10]) + "\t" + str(rults[0][11] +"\t"+str(rults[0][5]) )
+        (rults[0][8])) + "\t" + str(rults[0][10]) + "\t" + str(rults[0][11] + "\t" + str(rults[0][5]))
     new_row = {'Genes': counter, 'p_value': rults[0][11]}
     new_row2 = {'Genes': counter, "Effect size (Hedge's g)": rults[0][1],
                 'Standard_Error': rults[0][6], 'Q': rults[0][7], 'I_Squared': round(rults[0][9], 2),
                 'Tau_Squared': rults[0][12], 'p_Q_value': rults[0][8], 'z_test_value': rults[0][10],
-                'p_value': rults[0][11], 'num_of_studies': number_of_gene_studies , 'cases': num_of_cases, 'controls':num_of_controls}
+                'p_value': rults[0][11], 'num_of_studies': number_of_gene_studies, 'cases': num_of_cases,
+                'controls': num_of_controls}
     genes_p_values.append(new_row)
     meta_analysis_df.append(new_row2)
 
@@ -492,6 +743,7 @@ def altmeta(y1, s2):
     p = 1 - norm.cdf(abs(z))
     return (Q, I2, tau2_DL, p_Q, se, z, mu_bar, p)
 
+
 def altmeta_single_records(y1, s2):
     n = len(y1)
     w = [(1 / x) for x in s2]
@@ -501,6 +753,7 @@ def altmeta_single_records(y1, s2):
     z = (mu_bar / se)
     p = 1 - norm.cdf(abs(z))
     return se, z, mu_bar, p
+
 
 # With this function we can conduct a bootstrapped meta_analysis
 def bootstrap_analysis(expressions_team1, expressions_team2, means1_table, means2_table, n):
@@ -534,7 +787,7 @@ def bootstrap_analysis(expressions_team1, expressions_team2, means1_table, means
     et1 = np.array(bootstrap(expressions_team1), dtype=object).flatten()
     et2 = np.array(bootstrap(expressions_team2), dtype=object).flatten()
 
-    print (et1)
+    print(et1)
     # for step in range(0,len(et1),5):   # change it for bigger iterations
     et1_sliced = [et1[i:i + n_of_res] for i in range(0, len(et1), n_of_res)]
     et2_sliced = [et2[i:i + n_of_res] for i in range(0, len(et2), n_of_res)]
@@ -736,41 +989,36 @@ def bootstrap_analysis(expressions_team1, expressions_team2, means1_table, means
     return pd.DataFrame(list_of_boot)
 
 
-def bootstrap_analysis2(expression_team,n):
+def bootstrap_analysis2(expression_team, n):
+    boot_df_list = []
 
-        boot_df_list =[]
-        def btstrap(a_data_frame):
-            btstr_data = pd.DataFrame(columns=a_data_frame.columns)
-            for a_data in range(a_data_frame.shape[0]):
-                selected_num = random.choice(range(a_data_frame.shape[0]))
-                btstr_data = btstr_data.append(a_data_frame[selected_num : selected_num + 1])
-            return btstr_data
+    def btstrap(a_data_frame):
+        btstr_data = pd.DataFrame(columns=a_data_frame.columns)
+        for a_data in range(a_data_frame.shape[0]):
+            selected_num = random.choice(range(a_data_frame.shape[0]))
+            btstr_data = btstr_data.append(a_data_frame[selected_num: selected_num + 1])
+        return btstr_data
 
+    boot_df_list = []
+    lista = expression_team
+    for dataframe in lista:
+        df = dataframe.T
+        df = df.rename(columns=df.iloc[0]).drop(df.index[0]).reset_index(drop=True)
+        #          a1bg a1bg_as1     a1cf      a2m  a4galt
+        # 0  0.07175  -0.0637   0.0927 -0.00156  -0.253
+        # 1 -0.00749    0.182    0.117   0.0791  0.0246
+        # 2  0.06815   -0.148  -0.0838   0.0443 -0.0369
+        # 3    0.063   -0.176 -0.00781  -0.0961  0.0294
+        # df= df.astype(object)
+        for i in range(n):
+            tmp = btstrap(df)
 
-        boot_df_list =[]
-        lista =expression_team
-        for dataframe in lista:
-            df = dataframe.T
-            df = df.rename(columns=df.iloc[0]).drop(df.index[0]).reset_index(drop = True)
-            #          a1bg a1bg_as1     a1cf      a2m  a4galt
-            # 0  0.07175  -0.0637   0.0927 -0.00156  -0.253
-            # 1 -0.00749    0.182    0.117   0.0791  0.0246
-            # 2  0.06815   -0.148  -0.0838   0.0443 -0.0369
-            # 3    0.063   -0.176 -0.00781  -0.0961  0.0294
-            # df= df.astype(object)
-            for i in range(n):
-                tmp = btstrap(df)
+        btstrap_df = tmp.T.reset_index()
+        btstrap_df.columns = range(btstrap_df.shape[1])
+        #         btstrap_df = btstrap_df.reset_index().columns = range(btstrap_df.shape[1])
 
-
-            btstrap_df = tmp.T.reset_index()
-            btstrap_df.columns = range(btstrap_df.shape[1])
-            #         btstrap_df = btstrap_df.reset_index().columns = range(btstrap_df.shape[1])
-
-
-            boot_df_list.append(btstrap_df)
-        return boot_df_list
-
-
+        boot_df_list.append(btstrap_df)
+    return boot_df_list
 
 
 # With this function we can get the  one step methods (Bonferroni and Sidak)
@@ -784,14 +1032,14 @@ def get_one_step_methods(meta_analysis_df,
     exponent = 1 / m
     for i in range(m):  # a = 0.05 due to the 95 % CI
 
-            sidak.append(1 - (1 - alpha) ** exponent)
+        sidak.append(1 - (1 - alpha) ** exponent)
 
-            bonf.append( alpha / m)
-
-
+        bonf.append(alpha / m)
 
     one_step_methods = pd.DataFrame(list(zip(list(meta_analysis_df['Genes']), p_values, bonf, sidak)),
                                     columns=['genes_one_step', 'p_values_one_step', 'bonferroni', 'sidak'])
+
+    one_step_methods = one_step_methods.sort_values(by=['genes_one_step'], ascending=True)
     # print(one_step_methods)
     return (one_step_methods)
 
@@ -808,19 +1056,17 @@ def get_step_down_methods(meta_analysis_df,
     holm = []
     holland = []
     for i in range(m):
-
-
         holm.append(alpha / (m - (i) + 1))
 
         exponent = 1 / (m - (i) + 1)
 
         holland.append(1 - (1 - alpha) ** exponent)
 
-
-
     step_down_methods = pd.DataFrame(list(zip(list(meta_analysis_df['Genes']), p_values, holm, holland)),
                                      columns=['genes_step_down', 'p_values_step_down', 'holm', 'holland'])
     # print(step_down_methods)
+    step_down_methods = step_down_methods.sort_values(by=['genes_step_down'], ascending=True)
+
     return (step_down_methods)
 
 
@@ -829,51 +1075,53 @@ def get_step_up_methods(meta_analysis_df,
                         alpha):  # This function takes the (Simes and Hochberg)
 
     m = len(meta_analysis_df['p_value'])
-    meta_analysis_df = meta_analysis_df.sort_values(by=['p_value'], ascending= False)  # sort by p_value
+    meta_analysis_df = meta_analysis_df.sort_values(by=['p_value'], ascending=False)  # sort by p_value
     p_values = np.float64(np.array(meta_analysis_df['p_value']))
 
-
-
-    hochberg= []
+    hochberg = []
     simes = []
 
     simes.append(p_values[0])
     hochberg.append(p_values[0])
-    for i in range(m-1,0,-1):
-
-
-        hochberg.append(alpha/ (m + 1- i))
+    for i in range(m - 1, 0, -1):
+        hochberg.append(alpha / (m + 1 - i))
 
         simes.append((i * alpha) / m)
 
-
-
     step_up_methods = pd.DataFrame(list(zip(list(meta_analysis_df['Genes']), p_values, hochberg, simes)),
-                                     columns=['genes_step_up', 'p_values_step_up', 'hochberg', 'simes'])
+                                   columns=['genes_step_up', 'p_values_step_up', 'hochberg', 'simes'])
     # print(step_down_methods)
+
+    step_up_methods = step_up_methods.sort_values(by=['genes_step_up'], ascending=True)
     return step_up_methods
 
 
 # call  all the Multiple - tests functions (Bonferroni,Sidak,Holm,Holland,Simes and Hochberg from the upper functions)
 def all_multiple_tests(meta_analysis_df, alpha):
-    d1 = get_one_step_methods(meta_analysis_df, alpha)
-    d2 = get_step_down_methods(meta_analysis_df, alpha)
-    d3 = get_step_up_methods(meta_analysis_df, alpha)
+    d1 = get_one_step_methods(meta_analysis_df, alpha).reset_index(drop=True)
+    d2 = get_step_down_methods(meta_analysis_df, alpha).reset_index(drop=True)
+    d3 = get_step_up_methods(meta_analysis_df, alpha).reset_index(drop=True)
 
     total_df = pd.concat([d1, d2, d3], axis=1)
+    # print(total_df.sort_values(by=['genes_one_step'],ascending = (True)))
+    # total_df = total_df.sort_values(by=['genes_one_step'], ascending=True)
+    total_df = total_df.drop(['genes_step_up','genes_step_down'],axis = 1 )
+    print(total_df)
     return total_df
 
 
 def run(settings, data):
-    global controls_metan,cases_metan
+    global controls_metan, cases_metan
     num_of_reps = int(settings['num_of_reps'])
     alpha = float(settings['significance_level'])
     mult_tests = settings['multiple_comparisons']
     bootstrap = settings['bootstrap']
-    controls_metan = settings ['controls']
-    cases_metan  = settings ['cases']
-
-    # Splits the cases and the controls of our study
+    controls_metan = settings['controls']
+    cases_metan = settings['cases']
+    bayes = settings ['bayesian_meta_analysis']
+    a = int(settings ['a'])
+    b = int(settings ['b'])
+# Splits the cases and the controls of our study
     expressions_team1, expressions_team2, means1_table, means2_table = split_data(data)
 
     if bootstrap == 'YES':
@@ -886,18 +1134,23 @@ def run(settings, data):
         et1_new = []
         et2_new = []
         for df in et1:
-            tmp = df.iloc[:,1:].apply(pd.to_numeric)
-            et1_new.append(pd.concat([df[0],tmp], axis=1))
+            tmp = df.iloc[:, 1:].apply(pd.to_numeric)
+            et1_new.append(pd.concat([df[0], tmp], axis=1))
         for df in et2:
-            tmp = df.iloc[:,1:].apply(pd.to_numeric)
-            et2_new.append(pd.concat([df[0],tmp], axis=1))
-
+            tmp = df.iloc[:, 1:].apply(pd.to_numeric)
+            et2_new.append(pd.concat([df[0], tmp], axis=1))
 
         meta_analysis_df = calc_metadata2(et1_new, et2_new, alpha)
+
+    if bayes == 'YES':
+                    bayesian_df = calc_metadata_bayesian(expressions_team1, expressions_team2, a,b)
+                    return bayesian_df
+
     else:
 
         meta_analysis_df = calc_metadata(expressions_team1, expressions_team2, alpha)
-
+        meta_analysis_df = meta_analysis_df.sort_values(by = ['Genes'],ascending = True)
+        meta_analysis_df = meta_analysis_df.reset_index(drop=True)
     # Each function of these functions, conducts the multiple test functions  and returns a dataframe.
     step_down = get_step_down_methods(meta_analysis_df, alpha)
     step_up = get_step_up_methods(meta_analysis_df, alpha)
