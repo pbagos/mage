@@ -16,7 +16,7 @@ global settings, gprofiler_settings, version, studies
 settings = {}
 studies = []
 studies_transform = []
-version = '1.0.3'
+version = '1.0.4'
 
 
 def parse_args():
@@ -44,7 +44,7 @@ def parse_conf(conf_filename):
 if __name__ == '__main__':
     t0 = time.time()
     print("MAGE :: Meta-Analysis of Gene Expression")
-    print("Version " + version + "; March 2022")
+    print("Version " + version + "; December 2022")
     print("Copyright (C) 2021 Pantelis Bagos")
     print("Freely distributed under the GNU General Public Licence (GPLv3)")
     print("--------------------------------------------------------------------------")
