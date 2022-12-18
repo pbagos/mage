@@ -3,40 +3,34 @@
 #set the folder name contains study files
 study_dir = demo_user/studies/
 
-#Study files list separated by comma (,)
-# Study files for strandard and bootstrap meta-analysis
-study_files = study1.txt, study2.txt,study3.txt, study4.txt, study5.txt,study6.txt,study7.txt,study8.txt,study9.txt,study10.txt
-
-# Study files for multiple outcomes (multivariate meta-analysis)
-#study_files = a1.txt,a2.txt,a3.txt,a4.txt
-
-
 
 
 plots = YES
 #Annotation - Define Classes
-controls = 0
-cases = 1
+controls = CONTROL
+cases = CASE
 #only for Multivariate Analysis
 cases2 = 2
 
 #GISU Options
 RUN_GISU = NO
 #if YES load data from web, if NO load local data from folder data/
-gene_data_online = NO
+gene_data_online = YES
 #mean, min, max
+# If NO, load platforms
+updated_genes = YES
 transformation_method = mean
 #Platform name for file. For multiple study files insert a list of platforms separated by comma (,) one per study
-platform = GPL96
+platform = GPL201,GPL4191,GPL6947,GPL570,GPL6244,GPL570,GPL6244,GPL571,GPL6244,GPL17077,GPL339,GPL96,GPL571
 gene_history_file = data/Gene_History_Reference/gene_history.txt
 homo_sapiens_file = data/Homo_Sapiens_reference/homo_sapiens_gene.txt
 platforms_folder = data/Platforms/
 
 #Meta - Analysis Options
 bootstrap = NO
-num_of_reps = 100
+num_of_reps = 200
 #Level of Significance of Mulitple Comparisons
-significance_level = 0.01
+significance_level = 0.001
 #one_step , step_down, step_up, all
 multiple_comparisons = all
 
@@ -56,3 +50,10 @@ organism = hsapiens
 threshold = 0.05
 #Default 'fdr'. Other options are 'bonferroni' and 'g_SCS'
 threshold_method = fdr
+
+
+#Bayesian Meta-analysis
+bayesian_meta_analysis = NO
+#parameters for bayesian_meta_analysis
+a = 0
+b = 2
