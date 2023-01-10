@@ -92,6 +92,7 @@ if __name__ == '__main__':
 
             exit()
         else:
+            #metanalysis_df = metanalysis_df.drop(['p_values_one_step', 'p_values_step_up', 'p_values_step_down','genes_one_step'], axis=1)
             metanalysis_df.to_csv(filepath + 'meta_analysis_results.txt', sep='\t', mode='w')
 
         # create and save plots
@@ -103,8 +104,8 @@ if __name__ == '__main__':
 
 
 
-        genes_for_ea = metanalysis_df['genes_step_up'].where(
-            np.array(metanalysis_df['p_values_step_up'], dtype=float) < np.array(metanalysis_df['simes'], dtype=float) ).dropna().tolist()
+        genes_for_ea = metanalysis_df['Genes'].where(
+            np.array(metanalysis_df['p_value'],dtype=float) < np.array(metanalysis_df['simes'], dtype=float) ).dropna().tolist()
         print(str(len(genes_for_ea))+' genes for Enrichment Analysis')
 
         pd.DataFrame(genes_for_ea).to_csv(filepath + 'stat_significant_genes.txt', sep='\t', mode='w')
