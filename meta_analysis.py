@@ -1104,9 +1104,9 @@ def all_multiple_tests(meta_analysis_df, alpha):
 
     total_df = pd.concat([d1, d2, d3], axis=1)
     # print(total_df.sort_values(by=['genes_one_step'],ascending = (True)))
-    # total_df = total_df.sort_values(by=['genes_one_step'], ascending=True)
-    total_df = total_df.drop(['genes_step_up','genes_step_down'],axis = 1 )
-    print(total_df)
+    total_df = total_df.sort_values(by=['genes_one_step'], ascending=True)
+    #total_df = total_df.drop(['genes_step_up','genes_step_down'],axis = 1 )
+   # print(total_df)
     return total_df
 
 
@@ -1170,7 +1170,10 @@ def run(settings, data):
         tests = step_down
     else:
         tests = all_tests
-
+        
+        
+  
     meta_an = pd.concat([meta_analysis_df, tests], axis=1)
 
+    meta_an = meta_an.drop(['genes_one_step','genes_step_down','genes_step_up','p_values_step_down','p_values_step_up','p_values_one_step' ], axis=1)
     return meta_an
