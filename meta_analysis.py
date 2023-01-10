@@ -457,6 +457,7 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
 
             smd = md * J / s  # SMD with gamma function
             se = (J * J) * math.sqrt(N / (n1 * n2) + (smd * smd) / (2 * (N - 2)))
+         
 
             # Mean append
             y_i.append(smd)
@@ -466,20 +467,21 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
 
 
         # len of studies that participate in the bayesian meta-analysis
-        k = len(y_i)
-
+    
         # Posterior variance of the population effect
 
         # V(μ) =  2 (1+bRSS/2) / b*k *(2*a +k -3)
         # RSSb = Σ yi**2 - k* mean(y)**2
-        RSSb = 0
+  
         mean_y_i = mean(y_i)
         # max_stan1 = max(stan1)
         # max_stan2 = max(stan2)
-
+        RSSb_first = 0 
         for i in range(len(y_i)):
-            RSSb += y_i[i] ** 2 - k * mean_y_i ** 2
-
+            RSSb_first += y_i[i] ** 2 
+            
+        RSSb = RSSb_first - k * mean_y_i ** 2
+  
 
         #posterior expectation of the population parameter μ
 
