@@ -30,7 +30,7 @@ platforms_folder = data/Platforms/
 bootstrap = NO
 num_of_reps = 200
 #Level of Significance of Mulitple Comparisons
-significance_level = 0.001
+significance_level = 0.01
 #one_step , step_down, step_up, all
 multiple_comparisons = all
 
