@@ -2530,9 +2530,9 @@ def Stat_guess_TP(z):
             return '{:.8f}'.format(seeds[idx])
         if z>lmt_p_t[idx] :
             if z<lmt_p_t[idx+1]:
-                p= scipy.stats.norm.sf(abs(z))*2
+                p = scipy.stats.norm.sf(abs(z))*2
                 # p=seeds[idx+1]-((seeds[idx+1]-seeds[idx])*(lmt_p_t[idx+1]-z))/(lmt_p_t[idx+1]-lmt_p_t[idx])
-                return '{:.8f}'.format(p)
+                return '{:.16f}'.format(p)
 
 ###########################################
 '''
@@ -2631,6 +2631,7 @@ def CONT_MD (study):
 #Output SMD,SE{SMD}
 def CONT_Heg_SMD (study):
     m1,sd1,n1,m2,sd2,n2=CONT_chkzero (study[0:6])
+    # print(m1,sd1,n1,m2,sd2,n2)
     N=n1+n2
     # df=N-1
     df=N-2
@@ -2639,7 +2640,17 @@ def CONT_Heg_SMD (study):
     # smd=md*(1-3/(4*N-9))/s
     J=(math.gamma(df/2)/(math.sqrt(df/2)*math.gamma((df-1)/2)))
     # smd=md*(math.gamma(df/2)/(math.sqrt(df/2)*math.gamma((df-1)/2)))/s # SMD with gamma function
+
+    # if (s == 0):
+    #
+    #     #s = 0.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
+    #     smd = 0
+    #     se=(J*J)*math.sqrt( N/(n1*n2)+(smd*smd)/(2*(N-2)) )
+    #     return [smd,se]
+    if s== 0 :
+        s= 0.000000001
     smd=md*J/s # SMD with gamma function
+
     # se=math.sqrt(N/(n1*n2)+(smd*smd)/(2*(N-3.94))) # des to gia na to vglaleis swsta
     se=(J*J)*math.sqrt( N/(n1*n2)+(smd*smd)/(2*(N-2)) )
     return [smd,se]
