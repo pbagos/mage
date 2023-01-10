@@ -472,7 +472,7 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
 
         # V(μ) =  2 (1+bRSS/2) / b*k *(2*a +k -3)
         # RSSb = Σ yi**2 - k* mean(y)**2
-  
+        k = len(y_i)
         mean_y_i = mean(y_i)
         # max_stan1 = max(stan1)
         # max_stan2 = max(stan2)
