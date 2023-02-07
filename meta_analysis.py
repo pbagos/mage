@@ -450,6 +450,28 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
 
             m1 = float(row[0])
             m2 = float(row[3])
+
+            # print ('-------MEANS--------')
+            # print('\n')
+            # print(m1)
+            # print('\n')
+            # print(m2)
+            #
+            # print('\n')
+            # print ('-------STDEV--------')
+            # print('\n')
+            # print(sd1)
+            # print('\n')
+            # print(sd2)
+            # print('\n')
+
+
+            # print ('-------SPOOL--------')
+            # print('\n')
+            # print(s)
+            # print('\n')
+
+
             md = m1 - m2
             # smd=md*(1-3/(4*N-9))/s
             J = (math.gamma(df / 2) / (math.sqrt(df / 2) * math.gamma((df - 1) / 2)))
@@ -458,10 +480,14 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
             smd = md * J / s  # SMD with gamma function
             se = (J * J) * math.sqrt(N / (n1 * n2) + (smd * smd) / (2 * (N - 2)))
          
-
+            print('---COHEN D ----')
+            print(md/s)
             # Mean append
             y_i.append(smd)
-
+            # print('---SMD---')
+            # print(smd)
+            # print('---SE---')
+            # print(se)
             ste.append(se)
 
 
@@ -472,43 +498,81 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
 
         # V(μ) =  2 (1+bRSS/2) / b*k *(2*a +k -3)
         # RSSb = Σ yi**2 - k* mean(y)**2
-        k = len(y_i)
+  
         mean_y_i = mean(y_i)
         # max_stan1 = max(stan1)
         # max_stan2 = max(stan2)
+        k = len(y_i)
         RSSb_first = 0 
         for i in range(len(y_i)):
-            RSSb_first += y_i[i] ** 2 
+            RSSb_first += y_i[i] **2
             
-        RSSb = RSSb_first - k * mean_y_i ** 2
+        RSSb = RSSb_first - k * mean_y_i **2
   
-
+        print('----RSS----')
+        print(RSSb)
         #posterior expectation of the population parameter μ
 
-        first_big_sum = 0
-
+        first_big_sum_q = []
         for i in range (len(y_i)):
             sens_part1 = (n_i[i] -3) # Sensitive part for zero divisions
             if sens_part1 == 0.0:
-                sens_part1 = 0.000000001
+                first_big_sum_q.append(0)
+            else:
+                print()
+                print('-------SUM1-------')
 
+                q1 = (n_i[i]*ste[i]*ste[i]) /sens_part1
+                q2 = (mean_y_i*(k-3)+ y_i[i])/k
+                q3 = ((mean_y_i*mean_y_i*(mean_y_i - y_i[i])+mean_y_i*y_i[i]*y_i[i] )*(k+2*a+1)*b )/ (2*(1+b*RSSb/2))
 
+                print('------Q------')
+                print(q1)
+                print(q2)
+                print(q3)
+                q4 = q1*(q2 -q3)
+                print(q4)
+                first_big_sum_q.append(q4)
+                # first_big_sum+= ( (n_i[i]*ste[i]*ste[i])/sens_part1 )* (((mean_y_i*(k-3)+y_i[i])/k)  -  (( (mean_y_i*mean_y_i *(mean_y_i-y_i[i]) + mean_y_i*y_i[i]*y_i[i])*(k+2*a+1)*b)/(2*(1+b*RSSb/2)) ))
+                #first_big_sum+= ((n_i[i]*ste[i]**2)/(sens_part1))*( ((mean_y_i*(k-3)+y_i[i])/k ) - ((((mean_y_i**2*(mean_y_i - y_i[i])) +(mean_y_i*y_i[i]**2)*(k+2*a+1)*b)) /(2*(1+b*RSSb/2) )  ))
+        print('-------SUM1Q-------')
+        first_big_sum = sum(first_big_sum_q)
+        print(first_big_sum)
 
-            first_big_sum+= ( (n_i[i]*ste[i]*ste[i])/sens_part1 )* ((mean_y_i*(k-3)+y_i[i])/k  -  ( (mean_y_i**2 *(mean_y_i-y_i[i]) + mean_y_i*y_i[i]**2)*(k+2*a+1)*b)/(2*(1+b*RSSb/2)) )
+        second_big_sum_q = []
+
         second_big_sum = 0
         for i in range (len(y_i)):
-            sens_part1 = (n_i[i] -3) # Sensitive part for zero divisions
-            if sens_part1 == 0.0:
-                sens_part1 = 0.000000001
+            sens_part2 = (n_i[i] -3) # Sensitive part for zero divisions
+            if sens_part2 == 0.0:
+                second_big_sum_q.append(0)
+            else:
+                second_big_sum_q.append(( (n_i[i]*ste[i]*ste[i])/sens_part2)* (((k-1)/k ) -  (( (mean_y_i*(mean_y_i-y_i[i]) + y_i[i]**2)*(k+2*a+1)*b)/(2*(1+b*RSSb/2))) ))
 
-            second_big_sum+= ( (n_i[i]*ste[i]*ste[i])/sens_part1)* ((k-1)/k  -  ( (mean_y_i*(mean_y_i-y_i[i]) + y_i[i]**2)*(k+2*a+1)*b)/(2*(1+b*RSSb/2)) )
+        t1 = b*(k+2*a-1)
+        t2 = 2*(1+b*RSSb/2)
+        print('----T1----')
+        print(t1)
+        print('----T2----')
+        print(t2)
 
-        upper_part = mean_y_i - ((b*(k+2*a-1))/(2*(1+b*RSSb/2))) * first_big_sum
+        f = t1/t2
+        upper_part = mean_y_i - (f * first_big_sum)
 
 
-        lower_part = 1 - ((b*(k+2*a-1))/(2*(1+b*RSSb/2))) * second_big_sum
+        print('-------SUM2-------')
+        second_big_sum = sum(second_big_sum_q)
+        print(second_big_sum)
 
+        lower_part = 1 - (f * second_big_sum)
+        print('------------------------------------------------------------------------------')
+        print('------------------------------------------------------------------------------')
+        print('------------------------------------------------------------------------------')
 
+        print('---UPPER---')
+        print(upper_part)
+        print('---LOWER---')
+        print(lower_part)
         E_m = upper_part/lower_part
         sens_part2 =  b*k*(2*a+k-3)
         if (sens_part2 == 0 ):
