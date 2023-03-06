@@ -88,6 +88,11 @@ if __name__ == '__main__':
         if settings ['bayesian_meta_analysis'] == 'YES':
             print('Bayesian Meta-analysis started')
             metanalysis_df.to_csv(filepath + 'bayesian_meta_analysis_results.txt', sep='\t', mode='w')
+            genes_for_ea = metanalysis_df['Genes'].where(np.array(metanalysis_df['p_value'],dtype=float) < np.array(metanalysis_df['simes'], dtype=float) ).dropna().tolist()
+            print(str(len(genes_for_ea))+' genes for Enrichment Analysis')
+
+            pd.DataFrame(genes_for_ea).to_csv(filepath + 'stat_significant_genes.txt', sep='\t', mode='w')
+
             print('Bayesian Meta-analysis finished')
 
             exit()
