@@ -401,13 +401,14 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
     CI_low = []
     CI_up = []
     g_list = []
+    p_values_list = []
     for i in range(len(x.columns)):
         # Initialize lists for bayesian meta-analysis
 
         # Means
         mean1 = []
         mean2 = []
-
+        # print(x.columns[i])
         # Standard Deviations
         stan1 = []
         stan2 = []
@@ -433,7 +434,7 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
 
             # print(row)
             if (row[1] == '0.0') and (row[4] == '0.0'):
-                # print('YES')
+                print('YES')
                 row[1] = max_stan1
                 row[4] = max_stan2
 
@@ -477,11 +478,14 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
             J = (math.gamma(df / 2) / (math.sqrt(df / 2) * math.gamma((df - 1) / 2)))
             n_i.append((row[2] * row[5]) / (row[2] + row[5]))
 
+            # if (s == 0 ):
+            #     s = 0.00000001
+
             smd = md * J / s  # SMD with gamma function
             se = (J * J) * math.sqrt(N / (n1 * n2) + (smd * smd) / (2 * (N - 2)))
          
-            print('---COHEN D ----')
-            print(md/s)
+            # print('---COHEN D ----')
+            # print(md/s)
             # Mean append
             y_i.append(smd)
             # print('---SMD---')
@@ -509,8 +513,8 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
             
         RSSb = RSSb_first - k * mean_y_i **2
   
-        print('----RSS----')
-        print(RSSb)
+        # print('----RSS----')
+        # print(RSSb)
         #posterior expectation of the population parameter μ
 
         first_big_sum_q = []
@@ -519,25 +523,25 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
             if sens_part1 == 0.0:
                 first_big_sum_q.append(0)
             else:
-                print()
-                print('-------SUM1-------')
+                # print()
+                # print('-------SUM1-------')
 
                 q1 = (n_i[i]*ste[i]*ste[i]) /sens_part1
                 q2 = (mean_y_i*(k-3)+ y_i[i])/k
                 q3 = ((mean_y_i*mean_y_i*(mean_y_i - y_i[i])+mean_y_i*y_i[i]*y_i[i] )*(k+2*a+1)*b )/ (2*(1+b*RSSb/2))
 
-                print('------Q------')
-                print(q1)
-                print(q2)
-                print(q3)
+                # print('------Q------')
+                # print(q1)
+                # print(q2)
+                # print(q3)
                 q4 = q1*(q2 -q3)
-                print(q4)
+                # print(q4)
                 first_big_sum_q.append(q4)
                 # first_big_sum+= ( (n_i[i]*ste[i]*ste[i])/sens_part1 )* (((mean_y_i*(k-3)+y_i[i])/k)  -  (( (mean_y_i*mean_y_i *(mean_y_i-y_i[i]) + mean_y_i*y_i[i]*y_i[i])*(k+2*a+1)*b)/(2*(1+b*RSSb/2)) ))
                 #first_big_sum+= ((n_i[i]*ste[i]**2)/(sens_part1))*( ((mean_y_i*(k-3)+y_i[i])/k ) - ((((mean_y_i**2*(mean_y_i - y_i[i])) +(mean_y_i*y_i[i]**2)*(k+2*a+1)*b)) /(2*(1+b*RSSb/2) )  ))
-        print('-------SUM1Q-------')
+        # print('-------SUM1Q-------')
         first_big_sum = sum(first_big_sum_q)
-        print(first_big_sum)
+        # print(first_big_sum)
 
         second_big_sum_q = []
 
@@ -551,28 +555,28 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
 
         t1 = b*(k+2*a-1)
         t2 = 2*(1+b*RSSb/2)
-        print('----T1----')
-        print(t1)
-        print('----T2----')
-        print(t2)
+        # print('----T1----')
+        # print(t1)
+        # print('----T2----')
+        # print(t2)
 
         f = t1/t2
         upper_part = mean_y_i - (f * first_big_sum)
 
 
-        print('-------SUM2-------')
+        # print('-------SUM2-------')
         second_big_sum = sum(second_big_sum_q)
-        print(second_big_sum)
+        # print(second_big_sum)
 
         lower_part = 1 - (f * second_big_sum)
-        print('------------------------------------------------------------------------------')
-        print('------------------------------------------------------------------------------')
-        print('------------------------------------------------------------------------------')
+        # print('------------------------------------------------------------------------------')
+        # print('------------------------------------------------------------------------------')
+        # print('------------------------------------------------------------------------------')
 
-        print('---UPPER---')
-        print(upper_part)
-        print('---LOWER---')
-        print(lower_part)
+        # # print('---UPPER---')
+        # print(upper_part)
+        # # print('---LOWER---')
+        # print(lower_part)
         E_m = upper_part/lower_part
         sens_part2 =  b*k*(2*a+k-3)
         if (sens_part2 == 0 ):
@@ -597,13 +601,15 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
 
         conf_int_up =   E_m + 1.96*math.sqrt(abs(V_mu))
         conf_int_lower = E_m - 1.96*math.sqrt(abs(V_mu))
-
+        z =  E_m/abs(V_mu)
+        p_value =  norm.sf(abs(z))*2
         # E_m_list = []
         # V_t_list = []
         # E_t_list  = []
         # V_m_list = []
         # CI_low = []
         # CI_up = []
+
         g_list.append(counter)
         E_m_list.append(E_m)
         E_t_list.append(E_tau_square)
@@ -611,8 +617,13 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
         V_t_list.append(V_tau_square)
         CI_low.append(conf_int_lower)
         CI_up.append(conf_int_up)
+        p_values_list.append(p_value)
 
-    bayesian_df = pd.DataFrame(list(zip(g_list,E_m_list,V_m_list,E_t_list,V_t_list,CI_low,CI_up)),columns=['Gene','E(mu)','V(mu)','E(tau-square)','V(tau-square)','CI_95%_low','CI_95%_up' ])
+    bayesian_df = pd.DataFrame(list(zip(g_list,E_m_list,V_m_list,E_t_list,V_t_list,CI_low,CI_up,p_values_list)),columns=['Genes','E(mu)','V(mu)','E(tau-square)','V(tau-square)','CI_95%_low','CI_95%_up','p_value' ])
+    step_up = get_step_up_methods(bayesian_df,0.05).sort_values(by = ['genes_step_up'],ascending = True).reset_index(drop=True)
+    bayesian_df = bayesian_df.sort_values(by = ['Genes'],ascending = True).reset_index(drop=True)
+    bayesian_df = pd.concat([bayesian_df,step_up],axis =1 )
+    bayesian_df = bayesian_df.drop(['genes_step_up','p_values_step_up'],axis=1)
     return bayesian_df
 
 
