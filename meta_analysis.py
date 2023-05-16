@@ -394,6 +394,7 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
     # print(list(gene_names)) # Every column is a gene
 
     global counter, index, stat_sign_individ_genes
+    z_list = []
     E_m_list = []
     V_t_list = []
     E_t_list  = []
@@ -580,11 +581,13 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
         E_m = upper_part/lower_part
         sens_part2 =  b*k*(2*a+k-3)
         if (sens_part2 == 0 ):
-            sens_part2 = 0.000000001
+            sens_part2 = 0.0000000000000000000000001
+            #continue
 
         sens_part3 =  b*(2*a+k-3)
         if (sens_part3 == 0 ):
-            sens_part3 = 0.000000001
+            sens_part3 = 0.0000000000000000000000001
+            #continue
 
 
         V_mu = (2 *(1+b*RSSb/2))/(sens_part2)
@@ -598,11 +601,15 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
         V_tau_square =(8 *(1+b*RSSb/2)**2)/(sens_part4)
 
 
+        if V_mu <0 :
+            # print(counter,V_mu)
+            continue
 
-        conf_int_up =   E_m + 1.96*math.sqrt(abs(V_mu))
-        conf_int_lower = E_m - 1.96*math.sqrt(abs(V_mu))
-        z =  E_m/abs(V_mu)
+        conf_int_up =   E_m + 1.96*math.sqrt(V_mu)
+        conf_int_lower = E_m - 1.96*math.sqrt(V_mu)
+        z =  E_m/math.sqrt(V_mu)
         p_value =  norm.sf(abs(z))*2
+
         # E_m_list = []
         # V_t_list = []
         # E_t_list  = []
@@ -617,9 +624,10 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
         V_t_list.append(V_tau_square)
         CI_low.append(conf_int_lower)
         CI_up.append(conf_int_up)
+        z_list.append(z)
         p_values_list.append(p_value)
 
-    bayesian_df = pd.DataFrame(list(zip(g_list,E_m_list,V_m_list,E_t_list,V_t_list,CI_low,CI_up,p_values_list)),columns=['Genes','E(mu)','V(mu)','E(tau-square)','V(tau-square)','CI_95%_low','CI_95%_up','p_value' ])
+    bayesian_df = pd.DataFrame(list(zip(g_list,E_m_list,V_m_list,E_t_list,V_t_list,CI_low,CI_up,z_list,p_values_list)),columns=['Genes','E(mu)','V(mu)','E(tau-square)','V(tau-square)','CI_95%_low','CI_95%_up','z','p_value' ])
     step_up = get_step_up_methods(bayesian_df,0.05).sort_values(by = ['genes_step_up'],ascending = True).reset_index(drop=True)
     bayesian_df = bayesian_df.sort_values(by = ['Genes'],ascending = True).reset_index(drop=True)
     bayesian_df = pd.concat([bayesian_df,step_up],axis =1 )
