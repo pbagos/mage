@@ -508,12 +508,18 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
         # max_stan1 = max(stan1)
         # max_stan2 = max(stan2)
         k = len(y_i)
+        if k <3 :
+            a = 2
+            b= 2
+        else:
+            a=0
+            b=2
+
         RSSb_first = 0 
         for i in range(len(y_i)):
             RSSb_first += y_i[i] **2
             
         RSSb = RSSb_first - k * mean_y_i **2
-  
         # print('----RSS----')
         # print(RSSb)
         #posterior expectation of the population parameter μ
@@ -601,9 +607,9 @@ def calc_metadata_bayesian(expressions_team2, expressions_team1, a,b):
         V_tau_square =(8 *(1+b*RSSb/2)**2)/(sens_part4)
 
 
-        if V_mu <0 :
-            # print(counter,V_mu)
-            continue
+        # if V_mu <0 :
+        #     print(counter,V_mu,RSSb,RSSb_first,k,mean_y_i**2)
+        #     continue
 
         conf_int_up =   E_m + 1.96*math.sqrt(V_mu)
         conf_int_lower = E_m - 1.96*math.sqrt(V_mu)
