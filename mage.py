@@ -11,7 +11,7 @@ import multivariate
 import os
 import plots
 import enrichment_analysis
-
+import simple_meta_analysis
 global settings, gprofiler_settings, version, studies
 settings = {}
 studies = []
@@ -58,6 +58,39 @@ if __name__ == '__main__':
     file_list = os.listdir(settings['study_dir'])
     print(file_list)
     alpha = float(settings['significance_level'])
+
+    if settings.get('run_simple_meta_analysis') == 'YES':
+        # Run simple meta-analysis
+        metanalysis_df = simple_meta_analysis.simple_meta_analysis(file_list,settings['study_dir'],float(settings['significance_level']),settings['multiple_comparisons'])
+        metanalysis_df.to_csv(filepath + 'meta_analysis_results.txt', sep='\t', mode='w')
+
+        # create and save plots
+        if settings.get('plots') == 'YES':
+            plots.meta_analysis_plots(metanalysis_df, filepath, alpha)
+
+        if settings.get('enrichment_analysis') == 'YES':
+            print('Enrichment Analysis started')
+
+            genes_for_ea = metanalysis_df['Genes'].where(
+                np.array(metanalysis_df['p_value'], dtype=float) < np.array(metanalysis_df['simes'],
+                                                                            dtype=float)).dropna().tolist()
+            print(str(len(genes_for_ea)) + ' genes for Enrichment Analysis')
+
+            pd.DataFrame(genes_for_ea).to_csv(filepath + 'stat_significant_genes.txt', sep='\t', mode='w')
+            enrichment_analysis_df = enrichment_analysis.run(settings, genes_for_ea)
+            enrichment_analysis_df.to_csv(filepath + 'enrichment_analysis_results.txt',
+                                          header=enrichment_analysis_df.columns, index=None, sep='\t', mode='w')
+            if settings.get('plots') == 'YES':
+                plots.ea_manhattan_plot(enrichment_analysis_df, filepath, settings['threshold'])
+                plots.ea_heatmap_plot(enrichment_analysis_df, filepath)
+        t1 = time.time()
+        total = t1 - t0
+        print("Execution time = " + str(total) + '\t' + '  seconds')
+
+        exit()
+
+
+
     for i in range(len(file_list)):
         # Read file data
         studypath = settings['study_dir'] +'/'+ file_list[i].strip()
@@ -88,11 +121,6 @@ if __name__ == '__main__':
         if settings ['bayesian_meta_analysis'] == 'YES':
             print('Bayesian Meta-analysis started')
             metanalysis_df.to_csv(filepath + 'bayesian_meta_analysis_results.txt', sep='\t', mode='w')
-            genes_for_ea = metanalysis_df['Genes'].where(np.array(metanalysis_df['p_value'],dtype=float) < np.array(metanalysis_df['simes'], dtype=float) ).dropna().tolist()
-            print(str(len(genes_for_ea))+' genes for Enrichment Analysis')
-
-            pd.DataFrame(genes_for_ea).to_csv(filepath + 'stat_significant_genes.txt', sep='\t', mode='w')
-
             print('Bayesian Meta-analysis finished')
 
             exit()
