@@ -27,6 +27,11 @@ homo_sapiens_file = data/Homo_Sapiens_reference/homo_sapiens_gene.txt
 platforms_folder = data/Platforms/
 
 #Meta - Analysis Options
+
+#Run a meta-analysis giving only Effect Sizes and Standard Errors (YES or NO)
+run_simple_meta_analysis = YES
+
+
 bootstrap = NO
 num_of_reps = 200
 #Level of Significance of Mulitple Comparisons
