@@ -29,7 +29,7 @@ platforms_folder = data/Platforms/
 #Meta - Analysis Options
 
 #Run a meta-analysis giving only Effect Sizes and Standard Errors (YES or NO)
-run_simple_meta_analysis = YES
+run_simple_meta_analysis = NO
 
 
 bootstrap = NO
