@@ -2,7 +2,7 @@
 MAGE :: Meta-Analysis of Gene Expression
 
 ## Introduction
-MAGE, an acronym for Meta-Analysis of Gene Expression is a tool developed for gene expression analysis.
+MAGE, is an acronym for Meta-Analysis of Gene Expression.
 
 The overall aim of this work has been to develop a software tool that would offer a large collection of meta-analysis options, as well as several extensions to evaluate the software applied to various biological problems. The MAGE framework is characterized by:
 Speed: It takes a small amount of time to perform the functions which are included 
