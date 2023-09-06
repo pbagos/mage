@@ -96,7 +96,7 @@ def ea_manhattan_plot(data, filepath,threshold):
                        hue='source', palette='bright', legend='full')
     plot.ax.axhline(16, linestyle='--', linewidth=1)
 
-    plot.set_axis_labels('chromosomes', '-log10(Padj)')
+    plot.set_axis_labels('Source', '-log10(Padj)')
     plot.fig.suptitle('Enrichment Analysis - Manhattan plot', fontsize=16)
     plot.ax.set_xticks(df.groupby('group_id')['i'].median())
     plot.ax.set_xticklabels(df['source'].unique(), rotation=25)
