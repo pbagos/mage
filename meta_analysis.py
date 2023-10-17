@@ -803,8 +803,7 @@ def showresults(rults):
     new_row2 = {'Genes': counter, "Effect size (Hedge's g)": rults[0][1],
                 'Standard_Error': rults[0][6], 'Q': rults[0][7], 'I_Squared': round(rults[0][9], 2),
                 'Tau_Squared': rults[0][12], 'p_Q_value': rults[0][8], 'z_test_value': rults[0][10],
-                'p_value': rults[0][11], 'num_of_studies': number_of_gene_studies, 'cases': num_of_cases,
-                'controls': num_of_controls}
+                'p_value': rults[0][11], 'num_of_studies': number_of_gene_studies}
     genes_p_values.append(new_row)
     meta_analysis_df.append(new_row2)
 
