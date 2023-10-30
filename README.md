@@ -1,7 +1,7 @@
 # MAGE
 MAGE :: Meta-Analysis of Gene Expression
 
-## web tool
+## Web tool
 MAGE (v2.0) web tool : http://rs.dib.uth.gr:3839/MAGE/
 
 ## Introduction
