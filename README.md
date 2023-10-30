@@ -1,6 +1,9 @@
 # MAGE
 MAGE :: Meta-Analysis of Gene Expression
 
+## web tool
+MAGE (v2.0) web tool : http://rs.dib.uth.gr:3839/MAGE/
+
 ## Introduction
 MAGE, is an acronym for Meta-Analysis of Gene Expression.
 
