@@ -30,20 +30,21 @@ Requirements
 1)	Download MAGE from: https://github.com/pbagos/mage
 
     Otherwise, you can run MAGE from its online infrastructure at: http://www.compgen.org/tools/mage (Mozila Firefox browser is suggested)
+  	MAGE (v2.0) web tool : http://rs.dib.uth.gr:3839/MAGE/
 
-2)	After downloading the .zip folder of MAGE from GitHub, extract it to a working directory. 
+3)	After downloading the .zip folder of MAGE from GitHub, extract it to a working directory. 
 
-3)	Το install the requirements, pip needs to be installed. Download the script for pip, from: https://bootstrap.pypa.io/get-pip.py.
+4)	Το install the requirements, pip needs to be installed. Download the script for pip, from: https://bootstrap.pypa.io/get-pip.py.
 
-4)	Open a terminal/command prompt, cd to the folder containing the get-pip.py file and run:
+5)	Open a terminal/command prompt, cd to the folder containing the get-pip.py file and run:
     
     python get-pip.py
 
-5)	To install the mentioned requirements with pip, open a terminal/command prompt and run:
+6)	To install the mentioned requirements with pip, open a terminal/command prompt and run:
     
     pip install -r /path/to/requirements.txt
 
-6)	To execute MAGE, execute with:
+7)	To execute MAGE, execute with:
    
 
     python mage.py  -c conf.txt  -o results/
