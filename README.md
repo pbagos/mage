@@ -49,18 +49,19 @@ Requirements
 4)	Το install the requirements, pip needs to be installed. Download the script for pip, from: https://bootstrap.pypa.io/get-pip.py.
 
 5)	Open a terminal/command prompt, cd to the folder containing the get-pip.py file and run:
-    
+    ```
     python get-pip.py
+    ```
 
 6)	To install the mentioned requirements with pip, open a terminal/command prompt and run:
-    
+    ```
     pip install -r /path/to/requirements.txt
-
+    ```
 7)	To execute MAGE, execute with:
    
-
+    ```
     python mage.py  -c conf.txt  -o results/
-
+    ```
 ## Arguments and options
 MAGE provides the following command-line arguments:
   
