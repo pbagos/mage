@@ -2526,7 +2526,7 @@ def Stat_guess_TP(z):
     if z>=max(lmt_p_t) :
         p = scipy.stats.norm.sf(abs(z))*2
         # p=seeds[idx+1]-((seeds[idx+1]-seeds[idx])*(lmt_p_t[idx+1]-z))/(lmt_p_t[idx+1]-lmt_p_t[idx])
-        return '{:.400f}'.format(p)
+        return '{:.64f}'.format(p)
     for idx in range(len(lmt_p_t)):
         if z==lmt_p_t[idx] :
             return '{:.8f}'.format(seeds[idx])
@@ -2534,7 +2534,7 @@ def Stat_guess_TP(z):
             if z<lmt_p_t[idx+1]:
                 p = scipy.stats.norm.sf(abs(z))*2
                 # p=seeds[idx+1]-((seeds[idx+1]-seeds[idx])*(lmt_p_t[idx+1]-z))/(lmt_p_t[idx+1]-lmt_p_t[idx])
-                return '{:.400f}'.format(p)
+                return '{:.64f}'.format(p)
 
 ###########################################
 '''
