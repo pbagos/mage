@@ -12,6 +12,8 @@ import os
 import plots
 import enrichment_analysis
 import simple_meta_analysis
+from statsmodels.stats import multitest
+
 global settings, gprofiler_settings, version, studies
 settings = {}
 studies = []
@@ -31,6 +33,35 @@ def parse_args():
     return args
 
 
+
+
+def apply_multiple_testing_corrections(df, alpha):
+    """
+    Apply multiple hypothesis testing corrections to a column of p-values in a DataFrame.
+
+    Parameters:
+    - df: Pandas DataFrame containing a column of p-values.
+    - p_value_column: The name of the column containing p-values. Default is 'p_value'.
+    - alpha: Significance level for the hypothesis tests. Default is 0.0001.
+
+    Returns:
+    - Modified DataFrame with new columns for each of the adjusted p-values.
+    """
+    # Extract the p-values from the specified column
+    pvals = df['p_value']
+
+    # Apply multiple testing correction methods
+    methods = ['fdr_bh', 'holm-sidak', 'simes-hochberg', 'bonferroni', 'holm']
+    corrected_p_values = {}
+
+    for method in methods:
+        corrected_p_values[method] = multitest.multipletests(pvals, alpha=alpha, method=method, is_sorted=False)[1]
+
+    # Add the corrected p-values as new columns in the DataFrame
+    for method, values in corrected_p_values.items():
+        df[f'{method}_adj_p_value'] = values
+
+    return df
 def parse_conf(conf_filename):
     print("Preparing System Configuration (" + conf_filename + ")")
     """Parse configuration arguments."""
@@ -114,6 +145,7 @@ if __name__ == '__main__':
     if settings['multivariate'] == 'YES':
         print('Multivariate Analysis started')
         metanalysis_df = multivariate.run(settings, data, filepath)
+
         metanalysis_df.to_csv(filepath + 'multivariate_analysis_results.txt', sep='\t', mode='w')
     else:
         print('Meta-analysis started')
@@ -126,6 +158,7 @@ if __name__ == '__main__':
             exit()
         else:
             #metanalysis_df = metanalysis_df.drop(['p_values_one_step', 'p_values_step_up', 'p_values_step_down','genes_one_step'], axis=1)
+            metanalysis_df = apply_multiple_testing_corrections(metanalysis_df, alpha=alpha)
             metanalysis_df.to_csv(filepath + 'meta_analysis_results.txt', sep='\t', mode='w')
 
         # create and save plots
