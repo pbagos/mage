@@ -31,13 +31,16 @@ def split_data(dataframe_list):
 
     means1_table = []
     means2_table = []
+    # counter_of_studies = 0
     for df in dataframe_list:
+        # counter_of_studies +=1
+        # print(f"Study  {counter_of_studies}")
         # take the unique list annotation symbols
         df = df.dropna()
 
         gene_of_study = df.iloc[2:, 0].reset_index(drop=True)
         gene_of_study = gene_of_study.to_frame()
-
+        # print(df.head())
         team_cols1 = list(np.array(np.where(df.loc[1] == controls_metan), dtype=object).flatten())
         # team2
         team_cols2 = list(np.array(np.where(df.loc[1] == cases_metan), dtype=object).flatten())
@@ -803,7 +806,7 @@ def showresults(rults):
     new_row2 = {'Genes': counter, "Effect size (Hedge's g)": rults[0][1],
                 'Standard_Error': rults[0][6], 'Q': rults[0][7], 'I_Squared': round(rults[0][9], 2),
                 'Tau_Squared': rults[0][12], 'p_Q_value': rults[0][8], 'z_test_value': rults[0][10],
-                'p_value': rults[0][11], 'num_of_studies': number_of_gene_studies}
+                'p_value': norm.sf(rults[0][10])*2, 'num_of_studies': number_of_gene_studies}
     genes_p_values.append(new_row)
     meta_analysis_df.append(new_row2)
 
