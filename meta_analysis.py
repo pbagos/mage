@@ -31,10 +31,10 @@ def split_data(dataframe_list):
 
     means1_table = []
     means2_table = []
-    counter_of_studies = 0
+    #counter_of_studies = 0
     for df in dataframe_list:
         counter_of_studies +=1
-        print(f"Study  {counter_of_studies}")
+        #print(f"Study  {counter_of_studies}")
         # take the unique list annotation symbols
         df = df.dropna()
 
