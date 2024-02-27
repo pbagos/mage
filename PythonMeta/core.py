@@ -64,7 +64,7 @@ class Data:
         self.subgroup=[0]   #[0]number of subgroups,[1]... name of subgroups,study id...
         self.nototal=False  #flag of do NOT calculate the total effect
         logger.info("Load Data().")
-        
+
     #get studies from lines
     #input:formatted lines, e.g. studies.txt
     #output: studies[[],...]
@@ -143,7 +143,7 @@ class Data:
     def readfile(self,fname='studies.txt'):
         try:
             f = open(fname,"r")
-            lines = f.readlines()   
+            lines = f.readlines()
         except :
             Err="error.(no data file or file name error)"
             raise Exception(Err)
@@ -165,7 +165,7 @@ class Meta:
         self.subgroup=[0]      #[0]number of subgroups,[1]:[name of subgroup1, study id,...],[n]...
         self.nototal=False     #force to do NOT calculate overall effect
         logger.info("Load Meta().")
-        
+
     #check methods
     def chkmethods(self):
         self.datatype=chkdtype(self.datatype)
@@ -257,7 +257,7 @@ class Meta:
     #input:[[study],...], and the following attrs should be presetted before perform Meta()
     #models('Fixed','Random'),effect('OR','RR','RD','MD','SMD','SMD') and algorithm('MH','Peto','IV','IV-Heg','IV-Cnd','IV-Gls')
     #output:[[Total...],[study1...],...]
-    def meta0 (self, stds):  
+    def meta0 (self, stds):
         self.chkmethods()
         if self.datatype=='CATE':
             self.studies=CATE_en2abcd(stds)  #so, Data.studies may diff to Meta.studies
@@ -353,21 +353,21 @@ class Meta:
             results.extend(rult)
             stds=[]
         return results
-    
-#class of plot: forest，funnel, sensitivity    
-class Fig:    
+
+#class of plot: forest，funnel, sensitivity
+class Fig:
     def __init__(self,size=[6,6],dpi=80): #set figure
         self.size=size #inchs
         self.dpi=dpi   #default:80pts
-        self.title="Meta-analysis Results (Pymeta.com)"  
+        self.title="Meta-analysis Results (Pymeta.com)"
         self.nototal=False
-        
-        #plt.rcParams['font.sans-serif']=['SimHei'] #Chinese compatible 
+
+        #plt.rcParams['font.sans-serif']=['SimHei'] #Chinese compatible
                                                     #Chinese font do not support unicode (u'\u00b2')
                                                     #in this case, fontdict={'family' : 'serif'} may be helpful
         plt.rcParams['axes.unicode_minus']=False    #show minus "-"
         logger.info("Load Fig().")
-        
+
     #Method of Drawing ForestPlot
     #input list structure:es_w_ci
     #results[0]:total; [0]'Total', [1]OR, [2]weight, [3]LCI, [4]UCI, [5]N, [6]SE{Ln(OR)}, [7]Q, [8]p, [9]I2 ...
@@ -387,7 +387,7 @@ class Fig:
 #########################
 #general functions
 #########################
-def midstr(content,startStr='',endStr='',inc=False): 
+def midstr(content,startStr='',endStr='',inc=False):
     if content=="":
         return ""
     if startStr+endStr=='':
@@ -2461,7 +2461,7 @@ def Stat_CI95 (ES, SE, EStype='normal') :
         return [math.pow (10, math.log10(ES)-1.96*SE), math.pow (10, math.log10(ES)+1.96*SE)]
     else:
         return [ES-1.96*SE, ES+1.96*SE]
-    
+
 #chisquare Test,NOT used in this case
 #Input: [Observer values],[Expected values]
 #Output: chisquare, k, p
@@ -2492,7 +2492,7 @@ def Stat_guess_CSP(cs,k):
             return '{:.3f}'.format(seeds[idx])
         if cs>lmt_p_cs[idx] :
             if cs<lmt_p_cs[idx+1]:
-                p=seeds[idx+1]-((seeds[idx+1]-seeds[idx])*(lmt_p_cs[idx+1]-cs))/(lmt_p_cs[idx+1]-lmt_p_cs[idx])                
+                p=seeds[idx+1]-((seeds[idx+1]-seeds[idx])*(lmt_p_cs[idx+1]-cs))/(lmt_p_cs[idx+1]-lmt_p_cs[idx])
                 return '{:.3f}'.format(p)
 
     return '0.000'
@@ -2526,7 +2526,7 @@ def Stat_guess_TP(z):
     if z>=max(lmt_p_t) :
         p = scipy.stats.norm.sf(abs(z))*2
         # p=seeds[idx+1]-((seeds[idx+1]-seeds[idx])*(lmt_p_t[idx+1]-z))/(lmt_p_t[idx+1]-lmt_p_t[idx])
-        return '{:.64f}'.format(p)
+        return '{:.400f}'.format(p)
     for idx in range(len(lmt_p_t)):
         if z==lmt_p_t[idx] :
             return '{:.8f}'.format(seeds[idx])
@@ -2534,7 +2534,7 @@ def Stat_guess_TP(z):
             if z<lmt_p_t[idx+1]:
                 p = scipy.stats.norm.sf(abs(z))*2
                 # p=seeds[idx+1]-((seeds[idx+1]-seeds[idx])*(lmt_p_t[idx+1]-z))/(lmt_p_t[idx+1]-lmt_p_t[idx])
-                return '{:.64f}'.format(p)
+                return '{:.400f}'.format(p)
 
 ###########################################
 '''
@@ -2544,7 +2544,7 @@ RR, SE(ln(RR));
 RD, SE(RD)
 '''
 
-#e1,n1,e2,n2 --> a,b,c,d 
+#e1,n1,e2,n2 --> a,b,c,d
 #experiment group:a=e1;b=n1-e1
 #control group:c=e2;d=n2-e2
 def CATE_en2abcd (studies,type='bad') :
@@ -2558,7 +2558,7 @@ def CATE_en2abcd (studies,type='bad') :
 
 #check empty cell for a,b,c,d
 #0.5 should be added to all cells for that study, except when a=c=0 or b=d=0
-def CATE_chkzero (study):    
+def CATE_chkzero (study):
     a,b,c,d=study[0:4]
     if a+b==0 or c+d==0:  #n1=0 or n2=0? should be wrong
         Err="error.(data wrong)"
@@ -2633,7 +2633,7 @@ def CONT_MD (study):
 #Output SMD,SE{SMD}
 def CONT_Heg_SMD (study):
     m1,sd1,n1,m2,sd2,n2=CONT_chkzero (study[0:6])
-    # print(m1,sd1,n1,m2,sd2,n2)
+
     N=n1+n2
     # df=N-1
     df=N-2
@@ -2650,11 +2650,13 @@ def CONT_Heg_SMD (study):
     #     se=(J*J)*math.sqrt( N/(n1*n2)+(smd*smd)/(2*(N-2)) )
     #     return [smd,se]
     if s== 0 :
+
         s= 0.000000001
     smd=md*J/s # SMD with gamma function
+    smd2=md/s # SMD with gamma function
 
     # se=math.sqrt(N/(n1*n2)+(smd*smd)/(2*(N-3.94))) # des to gia na to vglaleis swsta
-    se=(J*J)*math.sqrt( N/(n1*n2)+(smd*smd)/(2*(N-2)) )
+    se=(J*J)*math.sqrt( N/(n1*n2)+(smd2*smd2)/(2*(N)) )
     return [smd,se]
 
 #SMD,SE{SMD}
@@ -2707,7 +2709,7 @@ def MH_Weight_OR (study):
 
 #Total Effect size & Weight & %95 CI
 #Input structure:[[a,b,c,d,'study_name'],...]
-#Input models='Fixed': MH;'Random':MH+DL 
+#Input models='Fixed': MH;'Random':MH+DL
 #Output structure:[[],...]
 #results[0][]:total; [0]'OR', [1]OR, [2]weight, [3]LCI, [4]UCI, [5]N, [6]SE{Ln(OR)}, [7]Q, [8]p for Q test, [9]I^2, [10]z, [11]p for z test...
 #results[i][]:studies; [0]study name, [1]OR, [2]weight, [3]LCI, [4]UCI, [5]n, [6]se{Ln(OR)}
@@ -2719,7 +2721,7 @@ def MH_total_OR (studies,models='Fixed'):
         Err="error.(studies should less than 200)"
         raise Exception(Err)
     tw,te,te_r=0,0,0;effs=[]
-    w_q,tw_q,te_q=0,0,0    
+    w_q,tw_q,te_q=0,0,0
     r1,r2,r3,r4,r5,r6=0,0,0,0,0,0
     #index=0: "OR",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,p_z
     results=[["OR",0,0,0,0,0,0,0,'',0,0,'',None]]
@@ -2727,7 +2729,7 @@ def MH_total_OR (studies,models='Fixed'):
         Tau2=DL_Tausqare (studies,'MH,OR')
         #index=0: "OR",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,'p_z',Tau^2
         results=[["OR",0,0,0,0,0,0,0,'',0,0,'',Tau2]]
-            
+
     for idx in range(len(studies)):
         #append a study: study name, effect size, weight, LCI, UCI, n
         es=CATE_OR (studies[idx][0:4])
@@ -2735,7 +2737,7 @@ def MH_total_OR (studies,models='Fixed'):
         w=MH_Weight_OR (studies[idx][0:4])
         w_q=w
         if models=='Random':
-            w=DL_Weight (se, Tau2)            
+            w=DL_Weight (se, Tau2)
         results.append([studies[idx][4]])             #[0]study name
         results[idx+1].append(es)                     #[1]es
         results[idx+1].append(w)                      #[2]weight
@@ -2760,13 +2762,13 @@ def MH_total_OR (studies,models='Fixed'):
         r4+=((a+d)*b*c/(N*N))
         r5+=((b+c)*a*d/(N*N))
         r6+=((b+c)*b*c/(N*N))
-    
+
     ttlES=te/tw
     ttlSE=math.sqrt((r3/(r1*r1)+(r4+r5)/(r1*r2)+r6/(r2*r2))/2)
     ttlES_Q=te_q/tw_q
     if models=='Random':
         ttlES=math.exp(te_r/tw)
-        ttlSE=1/math.sqrt(tw)    
+        ttlSE=1/math.sqrt(tw)
     #[0][1]total ES
     results[0][1]=ttlES
     #[0][3,4]total CI
@@ -2777,9 +2779,9 @@ def MH_total_OR (studies,models='Fixed'):
     results[0][7:9]=(MH_Q(effs,math.log(ttlES_Q)))
     #[0][9]I^2
     results[0][9]=Stat_Isquare(results[0][7],len(studies))
-    #[0][10,11] z, p of z_test    
+    #[0][10,11] z, p of z_test
     results[0][10:12]=(Stat_ztest(math.log(ttlES),ttlSE))
-    
+
     return results
 
 #====== RR ==============
@@ -2791,11 +2793,11 @@ def MH_Weight_RR (study):
 
 #Total Effect size & Weight & %95 CI ...
 #Input structure:[[a,b,c,d,'study_name'],...]
-#Input models='Fixed': MH;'Random':MH+DL 
+#Input models='Fixed': MH;'Random':MH+DL
 #Output structure:[[],...]
 #results[0][]:total; [0]'RR', [1]RR, [2]weight, [3]LCI, [4]UCI, [5]N, [6]SE{Ln(RR)}, [7]Q, [8]p for Q test, [9]I^2, [10]z, [11]p for z test...
 #results[i][]:studies; [0]study name, [1]RR, [2]weight, [3]LCI, [4]UCI, [5]n, [6]se{Ln(RR)}
-def MH_total_RR (studies,models='Fixed'):    
+def MH_total_RR (studies,models='Fixed'):
     if len(studies)<1:
         Err="error.(no study)"
         raise Exception(Err)
@@ -2803,7 +2805,7 @@ def MH_total_RR (studies,models='Fixed'):
         Err="error.(studies should less than 200)"
         raise Exception(Err)
     tw,te,te_r=0,0,0;effs=[]
-    w_q,tw_q,te_q=0,0,0   
+    w_q,tw_q,te_q=0,0,0
     r1,r2,r3=0,0,0
     #index=0: "RR",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,p_z
     results=[["RR",0,0,0,0,0,0,0,'',0,0,'',None]]
@@ -2811,7 +2813,7 @@ def MH_total_RR (studies,models='Fixed'):
         Tau2=DL_Tausqare (studies,'MH,RR')
         #index=0: "RR",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,'p_z',Tau^2
         results=[["RR",0,0,0,0,0,0,0,'',0,0,'',Tau2]]
-    
+
     for idx in range(len(studies)):
         #append a study: study name, effect size, weight, LCI, UCI, n
         es=CATE_RR (studies[idx][0:4])
@@ -2819,7 +2821,7 @@ def MH_total_RR (studies,models='Fixed'):
         w=MH_Weight_RR (studies[idx][0:4])
         w_q=w
         if models=='Random':
-            w=DL_Weight (se, Tau2)            
+            w=DL_Weight (se, Tau2)
         results.append([studies[idx][4]])             #[0]study name
         results[idx+1].append(es)                     #[1]es
         results[idx+1].append(w)                      #[2]weight
@@ -2829,7 +2831,7 @@ def MH_total_RR (studies,models='Fixed'):
         results[idx+1].append(se)                     #[6]se{Ln(RR)}
         effs.append([math.log(es),se])                #for cal Q,p
         results[0][2]+=w                              #[0][2]total weight
-        results[0][5]+=sum(studies[idx][0:4])         #[0][5]total n        
+        results[0][5]+=sum(studies[idx][0:4])         #[0][5]total n
         #for cal total ES
         tw+=w
         te+=es*w
@@ -2842,13 +2844,13 @@ def MH_total_RR (studies,models='Fixed'):
         r1+=(n1*n2*(a+c)-a*c*N)/(N*N)
         r2+=a*n2/N
         r3+=c*n1/N
-   
+
     ttlES=te/tw
     ttlSE=math.sqrt(r1/(r2*r3))
     ttlES_Q=te_q/tw_q
     if models=='Random':
         ttlES=math.exp(te_r/tw)
-        ttlSE=1/math.sqrt(tw)        
+        ttlSE=1/math.sqrt(tw)
     #[0][1]total ES
     results[0][1]=ttlES
     #[0][3,4]total CI
@@ -2859,9 +2861,9 @@ def MH_total_RR (studies,models='Fixed'):
     results[0][7:9]=(MH_Q(effs,math.log(ttlES_Q)))
     #[0][9]I^2
     results[0][9]=Stat_Isquare(results[0][7],len(studies))
-    #[0][10,11] z, p of z_test    
+    #[0][10,11] z, p of z_test
     results[0][10:12]=(Stat_ztest(math.log(ttlES),ttlSE))
-    
+
     return results
 
 #====== RD ==============
@@ -2873,12 +2875,12 @@ def MH_Weight_RD (study):
 
 #Total Effect size & Weight & %95 CI
 #Input structure:[[a,b,c,d,'study_name'],...]
-#Input models='Fixed': MH;'Random':MH+DL 
+#Input models='Fixed': MH;'Random':MH+DL
 #Output structure:[[],...]
 #results[0][]:total; [0]'RD', [1]RD, [2]weight, [3]LCI, [4]UCI, [5]N, [6]SE{RD}, [7]Q, [8]p for Q test, [9]I^2, [10]z, [11]p for z test...
 #results[i][]:studies; [0]study name, [1]RD, [2]weight, [3]LCI, [4]UCI, [5]n, [6]se{RD}
 def MH_total_RD (studies,models='Fixed'):
-    
+
     if len(studies)<1:
         Err="error.(no study)"
         raise Exception(Err)
@@ -2886,7 +2888,7 @@ def MH_total_RD (studies,models='Fixed'):
         Err="error.(studies should less than 200)"
         raise Exception(Err)
     tw,te=0,0;effs=[]
-    w_q,tw_q,te_q=0,0,0 
+    w_q,tw_q,te_q=0,0,0
     r1,r2=0,0
     #index=0: "RD",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,p_z
     results=[["RD",0,0,0,0,0,0,0,'',0,0,'',None]]
@@ -2894,7 +2896,7 @@ def MH_total_RD (studies,models='Fixed'):
         Tau2=DL_Tausqare (studies,'MH,RD')
         #index=0: "RD",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,'p_z',Tau^2
         results=[["RD",0,0,0,0,0,0,0,'',0,0,'',Tau2]]
-    
+
     for idx in range(len(studies)):
         #append a study: study name, effect size, weight, LCI, UCI, n
         es=CATE_RD (studies[idx][0:4])
@@ -2902,7 +2904,7 @@ def MH_total_RD (studies,models='Fixed'):
         w=MH_Weight_RD (studies[idx][0:4])
         w_q=w
         if models=='Random':
-            w=DL_Weight (se, Tau2)            
+            w=DL_Weight (se, Tau2)
         results.append([studies[idx][4]])             #[0]study name
         results[idx+1].append(es)                     #[1]es
         results[idx+1].append(w)                      #[2]weight
@@ -2912,7 +2914,7 @@ def MH_total_RD (studies,models='Fixed'):
         results[idx+1].append(se)                     #[6]se{RD}
         effs.append([es,se])                          #for cal Q,p
         results[0][2]+=w                              #[0][2]total weight
-        results[0][5]+=sum(studies[idx][0:4])         #[0][5]total n        
+        results[0][5]+=sum(studies[idx][0:4])         #[0][5]total n
         #for cal total ES
         tw+=w
         te+=es*w
@@ -2923,14 +2925,14 @@ def MH_total_RD (studies,models='Fixed'):
         n1=a+b;n2=c+d;N=n1+n2
         r1+=(a*b*n2*n2*n2+c*d*n1*n1*n1)/(n1*n2*N*N)
         r2+=n1*n2/N
-    
+
     ttlES=te/tw
     ttlSE=math.sqrt(r1/(r2*r2))
     ttlES_Q=te_q/tw_q
     if models=='Random':
         ttlES=te/tw
         ttlSE=1/math.sqrt(tw)
-        
+
     #[0][1]total ES
     results[0][1]=ttlES
     #[0][3,4]total CI
@@ -2941,7 +2943,7 @@ def MH_total_RD (studies,models='Fixed'):
     results[0][7:9]=(MH_Q(effs,ttlES_Q))
     #[0][9]I^2
     results[0][9]=Stat_Isquare(results[0][7],len(studies))
-    #[0][10,11] z, p of z_test    
+    #[0][10,11] z, p of z_test
     results[0][10:12] = Stat_ztest(ttlES,ttlSE)
 
     #import pdb;pdb.set_trace()
@@ -2984,7 +2986,7 @@ def Peto_Q(effs,ttles):
     Q=0;p=0
     for idx in range(len(effs)):
         Q+=effs[idx][1]*(effs[idx][0]*effs[idx][0]-ttles*ttles)
-        
+
     p=Stat_guess_CSP(Q,len(effs))
     return [Q,p]
 
@@ -2993,7 +2995,7 @@ def Peto_Q(effs,ttles):
 #Output structure:[[],...]
 #results[0][]:total; [0]'OR', [1]OR, [2]weight, [3]LCI, [4]UCI, [5]N, [6]SE{Ln(OR)}, [7]Q, [8]p for Q test, [9]I^2, [10]z, [11]p for z test...
 #results[i][]:studies; [0]study name, [1]OR, [2]weight, [3]LCI, [4]UCI, [5]n, [6]se{Ln(OR)}
-def Peto_total_OR (studies):    
+def Peto_total_OR (studies):
     if len(studies)<1:
         Err="error.(no study)"
         raise Exception(Err)
@@ -3004,7 +3006,7 @@ def Peto_total_OR (studies):
     r1,r2,r3,r4,r5,r6=0,0,0,0,0,0
     #index=0: "OR",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,p_z
     results=[["OR",0,0,0,0,0,0,0,'',0,0,'',None]]
-    
+
     for idx in range(len(studies)):
         #append a study: study name, effect size, weight, LCI, UCI, n
         es=Peto_LnOR (studies[idx][0:4])
@@ -3018,11 +3020,11 @@ def Peto_total_OR (studies):
         results[idx+1].append(se)                     #[6]se{Ln(OR)}
         effs.append([es,w])                           #for cal Q,p
         results[0][2]+=w                              #[0][2]total weight
-        results[0][5]+=sum(studies[idx][0:4])         #[0][5]total n        
+        results[0][5]+=sum(studies[idx][0:4])         #[0][5]total n
         #for cal total ES,SE
         tw+=w
         te+=es*w
-    
+
     ttlES=math.exp(te/tw)
     ttlSE=1/math.sqrt(tw)
     #[0][1]total ES
@@ -3035,9 +3037,9 @@ def Peto_total_OR (studies):
     results[0][7:9]=(Peto_Q(effs,te/tw))
     #[0][9]I^2
     results[0][9]=Stat_Isquare(results[0][7],len(studies))
-    #[0][10,11] z, p of z_test    
+    #[0][10,11] z, p of z_test
     results[0][10:12]=(Stat_ztest(math.log(ttlES),ttlSE))
-    
+
     return results
 
 #########################################
@@ -3062,12 +3064,12 @@ def IV_Q(effs,ttles):
 
 #Total Effect size & Weight & %95 CI
 #Input structure:[[a,b,c,d,'study_name'],...]
-#Input models='Fixed': IV;'Random':IV+DL 
+#Input models='Fixed': IV;'Random':IV+DL
 #Output structure:[[],...]
 #results[0][]:total; [0]'OR', [1]OR, [2]weight, [3]LCI, [4]UCI, [5]N, [6]SE{RD}, [7]Q, [8]p for Q test, [9]I^2, [10]z, [11]p for z test...
 #results[i][]:studies; [0]study name, [1]OR, [2]weight, [3]LCI, [4]UCI, [5]n, [6]se{RD}
 def IV_total_OR (studies,models='Fixed'):
-    
+
     if len(studies)<1:
         Err="error.(no study)"
         raise Exception(Err)
@@ -3075,14 +3077,14 @@ def IV_total_OR (studies,models='Fixed'):
         Err="error.(studies should less than 200)"
         raise Exception(Err)
     tw,te=0,0;effs=[]
-    w_q,tw_q,te_q=0,0,0    
+    w_q,tw_q,te_q=0,0,0
     #index=0: "OR",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,'p_z'
     results=[["OR",0,0,0,0,0,0,0,'',0,0,'',None]]
     if models=='Random':
         Tau2=DL_Tausqare (studies,'IV,OR')
         #index=0: "OR",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,'p_z',Tau^2
         results=[["OR",0,0,0,0,0,0,0,'',0,0,'',Tau2]]
-    
+
     for idx in range(len(studies)):
         #append a study: study name, effect size, weight, LCI, UCI, n
         es=CATE_OR (studies[idx][0:4])
@@ -3090,7 +3092,7 @@ def IV_total_OR (studies,models='Fixed'):
         w=IV_Weight (se)
         w_q=w
         if models=='Random':
-            w=DL_Weight (se, Tau2)            
+            w=DL_Weight (se, Tau2)
         results.append([studies[idx][4]])             #[0]study name
         results[idx+1].append(es)                     #[1]es
         results[idx+1].append(w)                      #[2]weight
@@ -3100,13 +3102,13 @@ def IV_total_OR (studies,models='Fixed'):
         results[idx+1].append(se)                     #[6]lnse{OR}
         effs.append([math.log(es),se])                #for cal Q,p
         results[0][2]+=w                              #[0][2]total weight
-        results[0][5]+=sum(studies[idx][0:4])         #[0][5]total n        
+        results[0][5]+=sum(studies[idx][0:4])         #[0][5]total n
         #for cal total ES
         tw+=w
         te+=math.log(es)*w
         tw_q+=w_q
         te_q+=math.log(es)*w_q
-    
+
     ttlES=math.exp(te/tw)
     ttlSE=1/math.sqrt(tw)
     ttlES_Q=math.exp(te_q/tw_q)
@@ -3120,7 +3122,7 @@ def IV_total_OR (studies,models='Fixed'):
     results[0][7:9]=(IV_Q(effs,math.log(ttlES_Q)))
     #[0][9]I^2
     results[0][9]=Stat_Isquare(results[0][7],len(studies))
-    #[0][10,11] z, p of z_test    
+    #[0][10,11] z, p of z_test
     results[0][10:12] = Stat_ztest(math.log(ttlES),ttlSE)
 
     #import pdb;pdb.set_trace()
@@ -3128,12 +3130,12 @@ def IV_total_OR (studies,models='Fixed'):
 
 #Total Effect size & Weight & %95 CI
 #Input structure:[[a,b,c,d,'study_name'],...]
-#Input models='Fixed': IV;'Random':IV+DL 
+#Input models='Fixed': IV;'Random':IV+DL
 #Output structure:[[],...]
 #results[0][]:total; [0]'RR', [1]RR, [2]weight, [3]LCI, [4]UCI, [5]N, [6]SE{RD}, [7]Q, [8]p for Q test, [9]I^2, [10]z, [11]p for z test...
 #results[i][]:studies; [0]study name, [1]RR, [2]weight, [3]LCI, [4]UCI, [5]n, [6]se{RD}
 def IV_total_RR (studies,models='Fixed'):
-    
+
     if len(studies)<1:
         Err="error.(no study)"
         raise Exception(Err)
@@ -3141,14 +3143,14 @@ def IV_total_RR (studies,models='Fixed'):
         Err="error.(studies should less than 200)"
         raise Exception(Err)
     tw,te=0,0;effs=[]
-    w_q,tw_q,te_q=0,0,0   
+    w_q,tw_q,te_q=0,0,0
     #index=0: "RR",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,'p_z'
     results=[["RR",0,0,0,0,0,0,0,'',0,0,'',None]]
     if models=='Random':
         Tau2=DL_Tausqare (studies,'IV,RR')
         #index=0: "RR",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,'p_z',Tau^2
         results=[["RR",0,0,0,0,0,0,0,'',0,0,'',Tau2]]
-    
+
     for idx in range(len(studies)):
         #append a study: study name, effect size, weight, LCI, UCI, n
         es=CATE_RR (studies[idx][0:4])
@@ -3156,7 +3158,7 @@ def IV_total_RR (studies,models='Fixed'):
         w=IV_Weight (se)
         w_q=w
         if models=='Random':
-            w=DL_Weight (se, Tau2)            
+            w=DL_Weight (se, Tau2)
         results.append([studies[idx][4]])             #[0]study name
         results[idx+1].append(es)                     #[1]es
         results[idx+1].append(w)                      #[2]weight
@@ -3166,13 +3168,13 @@ def IV_total_RR (studies,models='Fixed'):
         results[idx+1].append(se)                     #[6]lnse{OR}
         effs.append([math.log(es),se])                #for cal Q,p
         results[0][2]+=w                              #[0][2]total weight
-        results[0][5]+=sum(studies[idx][0:4])         #[0][5]total n        
+        results[0][5]+=sum(studies[idx][0:4])         #[0][5]total n
         #for cal total ES
         tw+=w
         te+=math.log(es)*w
         tw_q+=w_q
         te_q+=math.log(es)*w_q
-    
+
     ttlES=math.exp(te/tw)
     ttlSE=1/math.sqrt(tw)
     ttlES_Q=math.exp(te_q/tw_q)
@@ -3186,7 +3188,7 @@ def IV_total_RR (studies,models='Fixed'):
     results[0][7:9]=(IV_Q(effs,math.log(ttlES_Q)))
     #[0][9]I^2
     results[0][9]=Stat_Isquare(results[0][7],len(studies))
-    #[0][10,11] z, p of z_test    
+    #[0][10,11] z, p of z_test
     results[0][10:12] = Stat_ztest(math.log(ttlES),ttlSE)
 
     #import pdb;pdb.set_trace()
@@ -3194,12 +3196,12 @@ def IV_total_RR (studies,models='Fixed'):
 
 #Total Effect size & Weight & %95 CI
 #Input structure:[[a,b,c,d,'study_name'],...]
-#Input models='Fixed': IV;'Random':IV+DL 
+#Input models='Fixed': IV;'Random':IV+DL
 #Output structure:[[],...]
 #results[0][]:total; [0]'RD', [1]RD, [2]weight, [3]LCI, [4]UCI, [5]N, [6]SE{RD}, [7]Q, [8]p for Q test, [9]I^2, [10]z, [11]p for z test...
 #results[i][]:studies; [0]study name, [1]RD, [2]weight, [3]LCI, [4]UCI, [5]n, [6]se{RD}
 def IV_total_RD (studies,models='Fixed'):
-    
+
     if len(studies)<1:
         Err="error.(no study)"
         raise Exception(Err)
@@ -3207,14 +3209,14 @@ def IV_total_RD (studies,models='Fixed'):
         Err="error.(studies should less than 200)"
         raise Exception(Err)
     tw,te=0,0;effs=[]
-    w_q,tw_q,te_q=0,0,0    
+    w_q,tw_q,te_q=0,0,0
     #index=0: "RD",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,'p_z'
     results=[["RD",0,0,0,0,0,0,0,'',0,0,'',None]]
     if models=='Random':
         Tau2=DL_Tausqare (studies,'IV,RD')
         #index=0: "RD",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,'p_z',Tau^2
         results=[["RD",0,0,0,0,0,0,0,'',0,0,'',Tau2]]
-    
+
     for idx in range(len(studies)):
         #append a study: study name, effect size, weight, LCI, UCI, n
         es=CATE_RD (studies[idx][0:4])
@@ -3222,7 +3224,7 @@ def IV_total_RD (studies,models='Fixed'):
         w=IV_Weight (se)
         w_q=w
         if models=='Random':
-            w=DL_Weight (se, Tau2)            
+            w=DL_Weight (se, Tau2)
         results.append([studies[idx][4]])             #[0]study name
         results[idx+1].append(es)                     #[1]es
         results[idx+1].append(w)                      #[2]weight
@@ -3231,13 +3233,13 @@ def IV_total_RD (studies,models='Fixed'):
         results[idx+1].append(se)                     #[6]RD
         effs.append([es,se])                          #for cal Q,p
         results[0][2]+=w                              #[0][2]total weight
-        results[0][5]+=sum(studies[idx][0:4])         #[0][5]total n        
+        results[0][5]+=sum(studies[idx][0:4])         #[0][5]total n
         #for cal total ES
         tw+=w
         te+=es*w
         tw_q+=w_q
         te_q+=es*w_q
-    
+
     ttlES=te/tw
     ttlSE=1/math.sqrt(tw)
     ttlES_Q=te_q/tw_q
@@ -3251,7 +3253,7 @@ def IV_total_RD (studies,models='Fixed'):
     results[0][7:9]=(IV_Q(effs,ttlES_Q))
     #[0][9]I^2
     results[0][9]=Stat_Isquare(results[0][7],len(studies))
-    #[0][10,11] z, p of z_test    
+    #[0][10,11] z, p of z_test
     results[0][10:12] = Stat_ztest(ttlES,ttlSE)
 
     #import pdb;pdb.set_trace()
@@ -3259,12 +3261,12 @@ def IV_total_RD (studies,models='Fixed'):
 
 #Total Effect size & Weight & %95 CI
 #Input structure:[[m1,sd1,n1m2,sd2,n2,'study_name'],...]
-#Input models='Fixed': IV;'Random':IV+DL 
+#Input models='Fixed': IV;'Random':IV+DL
 #Output structure:[[],...]
 #results[0][]:total; [0]'MD', [1]MD, [2]weight, [3]LCI, [4]UCI, [5]N, [6]SE{RD}, [7]Q, [8]p for Q test, [9]I^2, [10]z, [11]p for z test...
 #results[i][]:studies; [0]study name, [1]MD, [2]weight, [3]LCI, [4]UCI, [5]n, [6]se{RD}
 def IV_total_MD (studies,models='Fixed'):
-    
+
     if len(studies)<1:
         Err="error.(no study)"
         raise Exception(Err)
@@ -3272,21 +3274,21 @@ def IV_total_MD (studies,models='Fixed'):
         Err="error.(studies should less than 200)"
         raise Exception(Err)
     tw,te=0,0;effs=[]
-    w_q,tw_q,te_q=0,0,0    
+    w_q,tw_q,te_q=0,0,0
     #index=0: "MD",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,'p_z'
     results=[["MD",0,0,0,0,0,0,0,'',0,0,'',None]]
     if models=='Random':
         Tau2=DL_Tausqare (studies,'IV,MD')
         #index=0: "MD",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,'p_z',Tau^2
         results=[["MD",0,0,0,0,0,0,0,'',0,0,'',Tau2]]
-    
+
     for idx in range(len(studies)):
         #append a study: study name, effect size, weight, LCI, UCI, n
         es,se=CONT_MD (studies[idx][0:6])
         w=IV_Weight (se)
         w_q=w
         if models=='Random':
-            w=DL_Weight (se, Tau2)            
+            w=DL_Weight (se, Tau2)
         results.append([studies[idx][6]])             #[0]study name
         results[idx+1].append(es)                     #[1]es
         results[idx+1].append(w)                      #[2]weight
@@ -3295,13 +3297,13 @@ def IV_total_MD (studies,models='Fixed'):
         results[idx+1].append(se)                     #[6]MD
         effs.append([es,se])                          #for cal Q,p
         results[0][2]+=w                              #[0][2]total weight
-        results[0][5]+=(studies[idx][2]+studies[idx][5])         #[0][5]total n        
+        results[0][5]+=(studies[idx][2]+studies[idx][5])         #[0][5]total n
         #for cal total ES
         tw+=w
         te+=es*w
         tw_q+=w_q
         te_q+=es*w_q
-    
+
     ttlES=te/tw
     ttlSE=1/math.sqrt(tw)
     ttlES_Q=te_q/tw_q
@@ -3315,7 +3317,7 @@ def IV_total_MD (studies,models='Fixed'):
     results[0][7:9]=(IV_Q(effs,ttlES_Q))
     #[0][9]I^2
     results[0][9]=Stat_Isquare(results[0][7],len(studies))
-    #[0][10,11] z, p of z_test    
+    #[0][10,11] z, p of z_test
     results[0][10:12] = Stat_ztest(ttlES,ttlSE)
 
     #import pdb;pdb.set_trace()
@@ -3329,7 +3331,7 @@ def IV_total_MD (studies,models='Fixed'):
 #results[0][]:total; [0]'SMD', [1]SMD, [2]weight, [3]LCI, [4]UCI, [5]N, [6]SE{RD}, [7]Q, [8]p for Q test, [9]I^2, [10]z, [11]p for z test...
 #results[i][]:studies; [0]study name, [1]SMD, [2]weight, [3]LCI, [4]UCI, [5]n, [6]se{RD}
 def IV_total_SMD (studies,models='Fixed',algo='Heg'):
-    
+
     if len(studies)<1:
         Err="error.(no study)"
         raise Exception(Err)
@@ -3337,14 +3339,14 @@ def IV_total_SMD (studies,models='Fixed',algo='Heg'):
         Err="error.(studies should less than 200)"
         raise Exception(Err)
     tw,te=0,0;effs=[]
-    w_q,tw_q,te_q=0,0,0    
+    w_q,tw_q,te_q=0,0,0
     #index=0: "SMD",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,'p_z'
     results=[["SMD",0,0,0,0,0,0,0,'',0,0,'',None]]
     if models=='Random':
         Tau2=DL_Tausqare (studies,'IV,SMD'+','+algo)
         #index=0: "SMD",ES,weight,LCI,UCI,N,SE,Q,"p_Q",I^2,z,'p_z',Tau^2
         results=[["SMD",0,0,0,0,0,0,0,'',0,0,'',Tau2]]
-    
+
     for idx in range(len(studies)):
         #append a study: study name, effect size, weight, LCI, UCI, n
         if algo=='Heg':
@@ -3356,7 +3358,7 @@ def IV_total_SMD (studies,models='Fixed',algo='Heg'):
         w=IV_Weight (se)
         w_q=w
         if models=='Random':
-            w=DL_Weight (se, Tau2)            
+            w=DL_Weight (se, Tau2)
         results.append([studies[idx][6]])             #[0]study name
         results[idx+1].append(es)                     #[1]es
         results[idx+1].append(w)                      #[2]weight
@@ -3365,13 +3367,13 @@ def IV_total_SMD (studies,models='Fixed',algo='Heg'):
         results[idx+1].append(se)                     #[6]MD
         effs.append([es,se])                          #for cal Q,p
         results[0][2]+=w                              #[0][2]total weight
-        results[0][5]+=(studies[idx][2]+studies[idx][5])         #[0][5]total n        
+        results[0][5]+=(studies[idx][2]+studies[idx][5])         #[0][5]total n
         #for cal total ES
         tw+=w
         te+=es*w
         tw_q+=w_q
         te_q+=es*w_q
-    
+
     ttlES=te/tw
     ttlSE=1/math.sqrt(tw)
     ttlES_Q=te_q/tw_q
@@ -3385,7 +3387,7 @@ def IV_total_SMD (studies,models='Fixed',algo='Heg'):
     results[0][7:9]=(IV_Q(effs,ttlES_Q))
     #[0][9]I^2
     results[0][9]=Stat_Isquare(results[0][7],len(studies))
-    #[0][10,11] z, p of z_test    
+    #[0][10,11] z, p of z_test
     results[0][10:12] = Stat_ztest(ttlES,ttlSE)
 
     #import pdb;pdb.set_trace()
@@ -3419,7 +3421,7 @@ def DL_Tausqare(studies,type):
         rults=IV_total_SMD (studies,'Fixed','Cnd')
     elif type=='IV,SMD,Gls':
         rults=IV_total_SMD (studies,'Fixed','Gls')
-        
+
     #rults[i][6]:se
     #rults[0][7]:Q
     Q=0;w=0;ww=0
@@ -3432,7 +3434,7 @@ def DL_Tausqare(studies,type):
     k=len(studies)
     if Q<=k-1 :
         return 0
-    if w-ww/w == 0 :
+    if (w-ww/w) == 0 :
         return 0
     return max((Q-k+1)/(w-ww/w),0)
 
@@ -3468,7 +3470,7 @@ def Fig_Forest (size,dpi,es_w_ci, titletxt="Meta-analysis Results",no_ttl=False)
         Err="error.(failed to get effect size while drawing forest plot)"
         raise Exception(Err)
 
-    myfig = plt.figure(linewidth=1, figsize=size, dpi=dpi)  #Frameon=False, num="Forest plot by PythonMeta", 
+    myfig = plt.figure(linewidth=1, figsize=size, dpi=dpi)  #Frameon=False, num="Forest plot by PythonMeta",
     myfig.set_size_inches(size)
     plt.title(titletxt)
     ax = gca()
@@ -3478,7 +3480,7 @@ def Fig_Forest (size,dpi,es_w_ci, titletxt="Meta-analysis Results",no_ttl=False)
     ax.yaxis.set_ticks_position('left')
     plt.xticks(fontsize=9)
     plt.yticks(fontsize=9)
-    xlim=[];y_k=0;subgrp=[]  
+    xlim=[];y_k=0;subgrp=[]
     for i in range(len(es_w_ci)):
         xlim.append(es_w_ci[i][3])
         xlim.append(es_w_ci[i][4])
@@ -3489,7 +3491,7 @@ def Fig_Forest (size,dpi,es_w_ci, titletxt="Meta-analysis Results",no_ttl=False)
     xmin= _x_tran0(min(xlim))
     xmax= _x_tran0(max(xlim))
     xmax=max(abs(xmin),abs(xmax))
-    xmin=-xmax                    
+    xmin=-xmax
     plt.xlim(xmin*1.1,xmax*1.1)
     ylabel=[i[0].replace("<sub>","") for i in es_w_ci[1:]]
     if no_ttl==True :
@@ -3506,7 +3508,7 @@ def Fig_Forest (size,dpi,es_w_ci, titletxt="Meta-analysis Results",no_ttl=False)
     ylabel.reverse()
     ax.set_yticklabels(ylabel)
     ax.set_xticklabels([round(_x_tran1(x),2) for x in ax.get_xticks()])
-    plt.plot([0,0], [0,len(es_w_ci)+3], 'black')     
+    plt.plot([0,0], [0,len(es_w_ci)+3], 'black')
 
     if len(subgrp)>0:
         weight_all=subgrp[0][2]
@@ -3544,7 +3546,7 @@ def Fig_Forest (size,dpi,es_w_ci, titletxt="Meta-analysis Results",no_ttl=False)
         lncolor,lnstyle=("blue","-")
         plt.plot([_x_tran0(es_w_ci[i][3]),_x_tran0(es_w_ci[i][4])], [len(es_w_ci)-i+y_k,len(es_w_ci)-i+y_k], lncolor, linestyle=lnstyle, lw=1)
         #central block
-        k=weight*0.2+0.05 
+        k=weight*0.2+0.05
         x=[_x_tran0(es_w_ci[i][1])-k*(xmax*2.2/ymax),
            _x_tran0(es_w_ci[i][1])+k*(xmax*2.2/ymax),
            _x_tran0(es_w_ci[i][1])+k*(xmax*2.2/ymax),
@@ -3555,7 +3557,7 @@ def Fig_Forest (size,dpi,es_w_ci, titletxt="Meta-analysis Results",no_ttl=False)
            len(es_w_ci)-i+y_k-k,
            len(es_w_ci)-i+y_k-k,
            len(es_w_ci)-i+y_k+k]
-        plt.fill(x,y,color=lncolor, lw=1)  #filled: 
+        plt.fill(x,y,color=lncolor, lw=1)  #filled:
 
     if no_ttl==True:
         pass
@@ -3568,13 +3570,13 @@ def Fig_Forest (size,dpi,es_w_ci, titletxt="Meta-analysis Results",no_ttl=False)
            _x_tran0(es_w_ci[0][1])]
         y=[2.3,2,1.7,2,2.3]
         if (es_w_ci[0][9]<50) :
-            plt.fill(x,y,color="black", lw=1)  #filled: I2<50 
+            plt.fill(x,y,color="black", lw=1)  #filled: I2<50
         else :
-            plt.plot(x,y, 'black', lw=1)       #empty: I2>50 
+            plt.plot(x,y, 'black', lw=1)       #empty: I2>50
 
     plt.xlabel("Favours Experiment  Favours Control       ",fontsize=10) #effect direction,see Cochrane rules
     #plt.ylabel("Studies")
-    myfig.tight_layout() 
+    myfig.tight_layout()
     return myfig
 
 #Method of Drawing FunnelPlot
@@ -3605,7 +3607,7 @@ def Fig_Funnel (size,dpi,effs):
 
     plt.xlabel("Effect Size")
     plt.ylabel("Standard Error")
-    myfig.tight_layout() 
+    myfig.tight_layout()
     return myfig
 
 if __name__ == '__main__':
