@@ -8,7 +8,7 @@
 MAGE :: Meta-Analysis of Gene Expression
 
 ## Web tool
-MAGE (v2.0) web tool availalble at : http://rs.dib.uth.gr:3839/MAGE/ and http://195.251.108.185:3838/MAGE/
+MAGE (v2.0) web tool availalble at : [http://rs.dib.uth.gr:3839/MAGE/](https://rs.dib.uth.gr/MAGE/) and http://195.251.108.185:3838/MAGE/
 
 ## Citation
 Tamposis, I.A.; Manios, G.A.; Charitou, T.; Vennou, K.E.; Kontou, P.I.; Bagos, P.G. MAGE: An Open-Source Tool for Meta-Analysis of Gene Expression Studies. Biology 2022, 11, 895. https://doi.org/10.3390/biology11060895
