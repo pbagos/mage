@@ -42,7 +42,7 @@ Requirements
 1)	Download MAGE from: https://github.com/pbagos/mage
 
     Otherwise, you can run MAGE from its online infrastructure at: http://www.compgen.org/tools/mage (Mozila Firefox browser is suggested)
-  	MAGE (v2.0) web tool : http://rs.dib.uth.gr:3839/MAGE/ and http://195.251.108.185:3838/MAGE/
+  	MAGE (v2.0) web tool :  https://rs.dib.uth.gr/MAGE/ and http://195.251.108.211:3839/MAGE/
 
 3)	After downloading the .zip folder of MAGE from GitHub, extract it to a working directory. 
 
