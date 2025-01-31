@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from gprofiler import GProfiler
 
 
 
@@ -79,13 +80,28 @@ def run(settings, study, platform):
 
 
 def run_updated_genes(settings, study):
-    transformation_method = settings['transformation_method']
+  
+   
 
+    transformation_method = settings['transformation_method']
+    transformation_organism = settings['transformation_organism']
+    target_name  = settings['target_namespace']
+     
+    
     data = study.iloc[2:].copy()
     data.rename(columns={data.columns[0]: "ID_REF"}, inplace=True)
     # Get Gene IDs
     dataIDs = pd.DataFrame(data["ID_REF"])
 
+    # GConvert(probe IDs to Gene Sympols)
+    gp = GProfiler(return_dataframe=True)
+    conv = gp.convert(organism=transformation_organism,
+            query=list(list(data["ID_REF"])),
+            target_namespace= target_name)['converted']
+     
+    data["ID_REF"] = conv
+    # GConvert(probe IDs to Gene Sympols)
+    # print(data)
     for col in data.columns[2:]:
         data[col] = data[col].astype(float)
 
